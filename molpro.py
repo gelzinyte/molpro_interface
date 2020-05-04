@@ -18,6 +18,7 @@ from ase.data import atomic_numbers
 from collections import OrderedDict
 import xml.dom.minidom as minidom
 from html.parser import HTMLParser
+import collections.abc
 
 #list of methods ( I think!?)
 __all__ = ['MolproDatafile']
@@ -110,7 +111,7 @@ class MolproDatafile(OrderedDict):
                         self[key].append(separator+fields[1])
 
     def read(self, datafile):
-        if operator.isMappingType(datafile):
+        if isinstance(datafile, collections.abc.Mapping):
             self.update(datafile)
             return
         
@@ -254,7 +255,7 @@ class MolproDatafile(OrderedDict):
         if type(datafile) == type(''):
             datafile = open(datafile,'w')
 
-        for key, value in self.iteritems():
+        for key, value in self.items():
             #iteritems important here because order of lines matters
             #if have multiple instances of a command, say, 'hf' or 'charge'
             #the n occurrences of that keyword after the first will have #n appended
@@ -415,7 +416,7 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
                 energy_param=prop.attributes['value'].value.encode('ascii','ignore')
                 my_energy=energy_param_name
                 i_en=1
-                while my_energy in cluster.params.iterkeys():
+                while my_energy in iter(cluster.params.keys()):
                     i_en+=1
                     my_energy='_'.join([energy_param_name,str(i_en)])
                 cluster.params[my_energy] = float(energy_param) * Hartree
