@@ -3,21 +3,21 @@
 #Alan Nichol
 #
 
+# TODO ok/should delete imports that aren't called?
 import sys, string, os, operator, itertools, logging, glob, re, subprocess
 import numpy as np
 
-from quippy.atoms import Atoms
-from io import AtomsReaders, AtomsWriters, atoms_reader
-from quippy.dictionary import Dictionary
-from quippy.units import AU_FS, HARTREE, BOHR, BOLTZMANN_K, EV_A3_IN_GPA, DEBYE
-from quippy.periodictable import atomic_number
-from quippy.atoms import make_lattice, get_lattice_params
+from ase import Atoms
+from ase.units import Hartree, Bohr
 
-from ordereddict import OrderedDict
-from farray import *
-from math import pi
+# TODO not sure what atomic_number equivalent is
+# from quippy.periodictable import atomic_number
+from ase.data import atomic_numbers
+# from quippy.atoms import make_lattice, get_lattice_params ## not needed?
+
+from collections import OrderedDict
 import xml.dom.minidom as minidom
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 
 #list of methods ( I think!?)
 __all__ = ['MolproDatafile']
@@ -25,14 +25,7 @@ __all__ = ['MolproDatafile']
 #will have to include units mapping
 
 # this list is not complete and there is some crap in it as well - may have to rethink this.
-##### MODIFIED BY ESZTER SZEKELY, 03.04.2017.
-## I ADDED 'MP2-F12/3C(F)' and 'DF-MP2' TO THE LIST BELOW:
-##### MODIFIED BY ESZTER SZEKELY, 26.05.2017.
-## I ADDED 'DFUNC','BLYP','B','LYP','B-LYP' TO THE LIST BELOW:
-## also added 'MP2-F12' (22 May 2018)
-## 'CCSD(T)-F12B','CCSD(T)-F12' (24 May 2018) ######### I'm not sure if it was a bug or not that the latter was missing. will see soon...
-#####
-valid_datafile_keywords = ['ANGSTROM','SYMMETRY','ORIENT','GEOMTYP','***', '--', 'ACCURACY', 'ACPF', 'ACTIVE', 'ADD', 'AIMS', 'ALTERN', 'ANGULAR', 'AOINT', 'AQCC', 'BASIS', 'BMAT', 'BRUECKNER', 'CANONICAL', 'CANORB', 'CASPROJ', 'CASVB', 'CCSD', 'CCSD(T)','CCSD(T)-F12B','CCSD(T)-F12', 'CEPA', 'CHARGE', 'CHECK', 'CI', 'CI-PRO', 'CIGUESS', 'CIS', 'CISD', 'CIWEIGHTS', 'CLEAR', 'CLEARALL', 'CLOSED', 'COEFFS', 'COMPRESS', 'CON', 'CONFIG', 'CONICAL', 'COORD', 'COPT', 'CORE', 'CPMCSCF', 'CPP', 'CRIT', 'CUT', 'DATA', 'DDR', 'DELETE', 'DELOCAL', 'DELSTRUC', 'DEMC', 'DENSITY', 'DF-RKS', 'DF-UKS', 'DFTBLOCK', 'DFTDUMP', 'DFTFACTOR', 'DFTTHRESH', 'Difference gradients', 'DH', 'DIIS', 'DIP', 'DIP+', 'DIRECT', 'DM', 'DMA', 'DO', 'DONT', 'DUMMY', 'Q,X', ')', 'DUMP', 'ECP', 'ELSEIF', 'ENDDO', 'ENDIF', 'ENDZ', 'EOM', 'EOMPAR', 'EOMPRINT', 'ERASE', 'EXCHANGE', 'EXPEC', 'EXPEC2', 'EXTRA', 'FCI', 'FIELD', 'FIELD+', 'FILE', 'FIXORB', 'FIXSTRUC', 'FOCK', 'FORCE', 'FREEZE', 'FREQUENCIES', 'FROZEN', 'FULL', 'G1', 'GDIRECT', 'GENERAL', 'GEOMETRY', 'GEXPEC', 'GOTO', 'GPARAM', 'GPRINT', 'GRADTYP', 'GRID', 'GRIDPRINT', 'GRIDSAVE', 'GRIDSYM', 'GRIDTHRESH', 'GROUP', 'GTHRESH', 'GUESS', 'HESS', 'HESSELEM', 'HESSIAN', 'HF', ',', 'options', 'HF-SCF', 'IF', 'INACTIVE', 'INCLUDE', 'INDIVIDUAL', 'INIT', 'INSTANTON', 'INTOPT', 'IPOL', 'IPRINT', 'IRREPS', 'ITERATIONS', 'KS', 'KS-SCF', 'LABEL', 'LATTICE', 'LIMIT', 'LINEAR', 'LINESEARCH', 'LOCAL', 'LOCALI', 'LOCAO', 'LOCORB', 'LQUANT', 'MASS', 'MATROP', 'MAXDAV', 'MAXITER', 'MCSCF', 'MEMORY', 'MERGE', 'METHOD', 'MOLDEN', 'molpro', 'MOVE', 'MULTI', 'NACM', 'NATORB', 'NBO', 'NELEC', 'NOCASPROJ', 'NOCHECK', 'NOENEST', 'NOEXC', 'NOEXTRA', 'NOGPRINT', 'NOGRIDSAVE', 'NOGRIDSYM', 'NONLINEAR', 'NONUCLEAR', 'NOORDER', 'NOPAIR', 'NOSINGLE', 'NOSYMPROJ', 'NUMERICAL', 'NUMHES', 'OCC', 'OFFDIAG', 'OFFSET', 'OPEN', 'OPTG', 'OPTIM', 'OPTION', 'ORB', 'ORBIT', 'ORBITAL', 'ORBPERM', 'ORBPRINT', 'ORBREL', 'ORTH', 'ORTHCON', 'PAIR', 'PAIRS', 'PARAM', 'POLARIZABILITY', 'POLY', 'POP', 'POTENTIAL', 'PRINT', 'PROC', 'PROJECT', 'PROPERTY', 'PSPACE', 'PUNCH', 'PUT', 'QCI', 'QUAD', 'QUAD+', 'RADIAL', 'RADIUS', 'RANGEHYBRID', 'READ', 'READPUN', 'READVAR', 'REF', 'REFSTATE', 'REL', 'RELAX', 'RESTART', 'RESTRICT', 'RHF', 'RHF-SCF', 'RKS', 'RKS-SCF', 'ROOT', 'ROTATE', 'ROTATEA', 'RS2', 'RS2C', 'RS3', 'SADDLE', 'SAMC', 'SAVE', 'SCALE', 'SCHMIDT', 'SCORR', 'SELECT', 'SERVICE', 'SET', 'SHIFT', 'SHOW', 'SPECIAL', 'SPIN', 'SPINBASIS', 'START', 'STATE', 'STATUS', 'STEP', 'STRONG', 'STRUC', 'SURF', 'SYM', 'SYMELM', 'WF', ' card', 'SYMPROJ', 'TABLE', 'TEST', 'THERMO', 'THRESH', 'TRAN', 'TRAN2', 'TRANH', 'TRANS', 'TRNINT', 'TRUST', 'UHF', 'UHF-SCF', 'UKS', 'UKS-SCF', 'UNCOMPRESS', 'UPDATE', 'VARIABLE', 'VB', 'VBDUMP', 'VBWEIGHTS', 'VCI', 'VMP2', 'VORONOI', 'VSCF', 'WEIGHT', 'WF', 'WRITE', 'ZMAT', 'Program control:', '***', 'MEMORY', 'PUNCH', 'FILE', 'RESTART', 'INCLUDE', 'BASIS', 'GEOMETRY', 'ZMAT', 'PARALLEL', 'STATUS', 'PRINT', ',', 'GPRINT', 'THRESH', ',', 'GTHRESH', 'DIRECT', ',', 'GDIRECT', 'EXPEC', ',', 'GEXPEC', 'TEXT', 'EXIT', 'DO', 'ENDDO', 'IF', 'ELSEIF', 'ENDIF', 'IF block', 'GOTO', 'LABEL', 'DATA', 'DELETE', ', ', '      ERASE', 'MATROP', 'GRID', 'CUBE', 'CARTESIAN', 'SPHERICAL', 'USER', '--', 'Variables:', 'SET', 'SETI', 'SETA', 'CLEAR', 'CLEARALL', 'GETVAR', 'SHOW', 'TABLE', 'Wave function optimization:', 'INT', 'LSINT', 'SORT', 'CPP', 'HF', ', ', 'RHF', ', ', 'HF-SCF', ', or ', 'RHF-SCF', 'UHF', ' or ', 'UHF-SCF', 'DFT', 'KS', ', ', 'RKS', 'UKS', 'MULTI', ', ', 'MCSCF', ', or ', 'CASSCF', 'CASVB', 'CI', ', ', 'MRCI', ', or ', 'CI-PRO', 'CIPT2', 'ACPF', ', ', 'AQCC', 'CEPA', 'RS2', ', ', 'RS3', 'RS2C', 'MP2', 'MP3', 'MP4', 'CISD', 'CCSD', 'BCCD', 'QCI', ',', 'QCSID', 'UCCSD', 'RCCSD', 'FCI', ' or ', 'FULLCI', 'Local correlation methods:', 'LMP2', 'LMP3', 'LMP4','DF-MP2', 'LCISD', 'LCCSD','LCCSD(T)-F12','DF-LCCSD(T)-F12', 'Explicitly correlated methods:', 'MP2-F12/3C(F)','DF-MP2-R12', 'DF-MP2-F12','MP2-F12' 'DF-LMP2-R12', 'DF-LMP2-F12', 'Orbital manipulation:', 'LOCALI', 'MERGE', 'Properties and wavefunction analysis:', 'POP', 'DMA', 'PROPERTY', 'DIP', 'QUAD', 'LATTICE', 'Gradients and geometry optimization:', 'FORCES', 'OPTG', 'MIN', 'PUT', 'HESSIAN', 'FREQUENCY', 'MASS', 'DDR', 'QCISD, CCSD, LQCISD, LCCSD', ' can be appended by ', '(T)', '\nand then a perturbative correction for triple excitations will be computed (e.g., ', 'CCSD(T)', ').\n\n', 'HF', ', ', 'KS', ', ', 'MP2', ' and all local correlation methods can be prepended by ', 'DF-', ' to invoke density fitting.\n\n','DFUNC','BLYP','B-LYP','B','LYP','SM','DM','XX', 'YY', 'ZZ', 'XY', 'XZ', 'YZ']
+valid_datafile_keywords = ['ANGSTROM','SYMMETRY','ORIENT','GEOMTYP','***', '--', 'ACCURACY', 'ACPF', 'ACTIVE', 'ADD', 'AIMS', 'ALTERN', 'ANGULAR', 'AOINT', 'AQCC', 'BASIS', 'BMAT', 'BRUECKNER', 'CANONICAL', 'CANORB', 'CASPROJ', 'CASVB', 'CCSD', 'CCSD(T)', 'CEPA', 'CHARGE', 'CHECK', 'CI', 'CI-PRO', 'CIGUESS', 'CIS', 'CISD', 'CIWEIGHTS', 'CLEAR', 'CLEARALL', 'CLOSED', 'COEFFS', 'COMPRESS', 'CON', 'CONFIG', 'CONICAL', 'COORD', 'COPT', 'CORE', 'CPMCSCF', 'CPP', 'CRIT', 'CUT', 'DATA', 'DDR', 'DELETE', 'DELOCAL', 'DELSTRUC', 'DEMC', 'DENSITY', 'DF-RKS', 'DF-UKS', 'DFTBLOCK', 'DFTDUMP', 'DFTFACTOR', 'DFTTHRESH', 'Difference gradients', 'DH', 'DIIS', 'DIP', 'DIP+', 'DIRECT', 'DM', 'DMA', 'DO', 'DONT', 'DUMMY', 'Q,X', ')', 'DUMP', 'ECP', 'ELSEIF', 'ENDDO', 'ENDIF', 'ENDZ', 'EOM', 'EOMPAR', 'EOMPRINT', 'ERASE', 'EXCHANGE', 'EXPEC', 'EXPEC2', 'EXTRA', 'FCI', 'FIELD', 'FIELD+', 'FILE', 'FIXORB', 'FIXSTRUC', 'FOCK', 'FORCE', 'FREEZE', 'FREQUENCIES', 'FROZEN', 'FULL', 'G1', 'GDIRECT', 'GENERAL', 'GEOMETRY', 'GEXPEC', 'GOTO', 'GPARAM', 'GPRINT', 'GRADTYP', 'GRID', 'GRIDPRINT', 'GRIDSAVE', 'GRIDSYM', 'GRIDTHRESH', 'GROUP', 'GTHRESH', 'GUESS', 'HESS', 'HESSELEM', 'HESSIAN', 'HF', ',', 'options', 'HF-SCF', 'IF', 'INACTIVE', 'INCLUDE', 'INDIVIDUAL', 'INIT', 'INSTANTON', 'INTOPT', 'IPOL', 'IPRINT', 'IRREPS', 'ITERATIONS', 'KS', 'KS-SCF', 'LABEL', 'LATTICE', 'LIMIT', 'LINEAR', 'LINESEARCH', 'LOCAL', 'LOCALI', 'LOCAO', 'LOCORB', 'LQUANT', 'MASS', 'MATROP', 'MAXDAV', 'MAXITER', 'MCSCF', 'MEMORY', 'MERGE', 'METHOD', 'MOLDEN', 'molpro', 'MOVE', 'MULTI', 'NACM', 'NATORB', 'NBO', 'NELEC', 'NOCASPROJ', 'NOCHECK', 'NOENEST', 'NOEXC', 'NOEXTRA', 'NOGPRINT', 'NOGRIDSAVE', 'NOGRIDSYM', 'NONLINEAR', 'NONUCLEAR', 'NOORDER', 'NOPAIR', 'NOSINGLE', 'NOSYMPROJ', 'NUMERICAL', 'NUMHES', 'OCC', 'OFFDIAG', 'OFFSET', 'OPEN', 'OPTG', 'OPTIM', 'OPTION', 'ORB', 'ORBIT', 'ORBITAL', 'ORBPERM', 'ORBPRINT', 'ORBREL', 'ORTH', 'ORTHCON', 'PAIR', 'PAIRS', 'PARAM', 'POLARIZABILITY', 'POLY', 'POP', 'POTENTIAL', 'PRINT', 'PROC', 'PROJECT', 'PROPERTY', 'PSPACE', 'PUNCH', 'PUT', 'QCI', 'QUAD', 'QUAD+', 'RADIAL', 'RADIUS', 'RANGEHYBRID', 'READ', 'READPUN', 'READVAR', 'REF', 'REFSTATE', 'REL', 'RELAX', 'RESTART', 'RESTRICT', 'RHF', 'RHF-SCF', 'RKS', 'RKS-SCF', 'ROOT', 'ROTATE', 'ROTATEA', 'RS2', 'RS2C', 'RS3', 'SADDLE', 'SAMC', 'SAVE', 'SCALE', 'SCHMIDT', 'SCORR', 'SELECT', 'SERVICE', 'SET', 'SHIFT', 'SHOW', 'SPECIAL', 'SPIN', 'SPINBASIS', 'START', 'STATE', 'STATUS', 'STEP', 'STRONG', 'STRUC', 'SURF', 'SYM', 'SYMELM', 'WF', ' card', 'SYMPROJ', 'TABLE', 'TEST', 'THERMO', 'THRESH', 'TRAN', 'TRAN2', 'TRANH', 'TRANS', 'TRNINT', 'TRUST', 'UHF', 'UHF-SCF', 'UKS', 'UKS-SCF', 'UNCOMPRESS', 'UPDATE', 'VARIABLE', 'VB', 'VBDUMP', 'VBWEIGHTS', 'VCI', 'VMP2', 'VORONOI', 'VSCF', 'WEIGHT', 'WF', 'WRITE', 'ZMAT', 'Program control:', '***', 'MEMORY', 'PUNCH', 'FILE', 'RESTART', 'INCLUDE', 'BASIS', 'GEOMETRY', 'ZMAT', 'PARALLEL', 'STATUS', 'PRINT', ',', 'GPRINT', 'THRESH', ',', 'GTHRESH', 'DIRECT', ',', 'GDIRECT', 'EXPEC', ',', 'GEXPEC', 'TEXT', 'EXIT', 'DO', 'ENDDO', 'IF', 'ELSEIF', 'ENDIF', 'IF block', 'GOTO', 'LABEL', 'DATA', 'DELETE', ', ', '      ERASE', 'MATROP', 'GRID', 'CUBE', 'CARTESIAN', 'SPHERICAL', 'USER', '--', 'Variables:', 'SET', 'SETI', 'SETA', 'CLEAR', 'CLEARALL', 'GETVAR', 'SHOW', 'TABLE', 'Wave function optimization:', 'INT', 'LSINT', 'SORT', 'CPP', 'HF', ', ', 'RHF', ', ', 'HF-SCF', ', or ', 'RHF-SCF', 'UHF', ' or ', 'UHF-SCF', 'DFT', 'KS', ', ', 'RKS', 'UKS', 'MULTI', ', ', 'MCSCF', ', or ', 'CASSCF', 'CASVB', 'CI', ', ', 'MRCI', ', or ', 'CI-PRO', 'CIPT2', 'ACPF', ', ', 'AQCC', 'CEPA', 'RS2', ', ', 'RS3', 'RS2C', 'MP2', 'MP3', 'MP4', 'CISD', 'CCSD', 'BCCD', 'QCI', ',', 'QCSID', 'UCCSD', 'RCCSD', 'FCI', ' or ', 'FULLCI', 'Local correlation methods:', 'LMP2', 'LMP3', 'LMP4', 'LCISD', 'LCCSD', 'Explicitly correlated methods:', 'DF-MP2-R12', 'DF-MP2-F12', 'DF-LMP2-R12', 'DF-LMP2-F12', 'Orbital manipulation:', 'LOCALI', 'MERGE', 'Properties and wavefunction analysis:', 'POP', 'DMA', 'PROPERTY', 'DIP', 'QUAD', 'LATTICE', 'Gradients and geometry optimization:', 'FORCES', 'OPTG', 'MIN', 'PUT', 'HESSIAN', 'FREQUENCY', 'MASS', 'DDR', 'QCISD, CCSD, LQCISD, LCCSD', ' can be appended by ', '(T)', '\nand then a perturbative correction for triple excitations will be computed (e.g., ', 'CCSD(T)', ').\n\n', 'HF', ', ', 'KS', ', ', 'MP2', ' and all local correlation methods can be prepended by ', 'DF-', ' to invoke density fitting.\n\n']
 
 
 class KeyWordGetter(HTMLParser):
@@ -43,7 +36,7 @@ class KeyWordGetter(HTMLParser):
         self.ignore_these=[',','\n',' or ']
         
     def handle_starttag(self,tag,attributes):
-        if tag == 'tt' or tag == 'em': #HTMLParser converts tags to lower case
+        if tag == 'tt' or tag == 'em':  # HTMLParser converts tags to lower case
             self.is_keyword=True
         else:
             self.is_keyword=False
@@ -108,7 +101,7 @@ class MolproDatafile(OrderedDict):
                     print('WARNING: CHANGING BASIS DOES UNPREDICTABLE THINGS')
                 n=2
                 testkey = key
-                while testkey in self._keys: #find a key like charge#3 if charge and charge#2 are already taken
+                while testkey in self._keys:  # find a key like charge#3 if charge and charge#2 are already taken
                     testkey = key+"#%s" % n
                     n+=1
                 key = testkey
@@ -289,32 +282,33 @@ class MolproDatafile(OrderedDict):
             else:
                 datafile.write(shortkey+'\n')
 
-    def to_atoms(self):
-        #check if necessary input there & all makes sense
-        if self.has_key('GEOMETRY'):
-            block = self['geometry=']
-            
-        #now create
-        atoms = Atoms(n=len(block))
-        field_list = [line.strip() for line in block]
-        field_list = [line.split() for line in block]
-        
-        #Way this currently works any labels will be lost
-        #if want to use these for molecule specification
-        #will have to do something more clever
-        #label = re.compile('[0-9]')
-        #field_list = map(label.split, field_list[0])
-        elements = map(operator.itemgetter(0), field_list)
-
-        #Look up elements by atomic number
-        elements = [ not el.isdigit() and atomic_number(el) or el for el in elements ]
-        
-        #Transfer positions to Atoms object
-        # Set the element and pos data
-        atoms.set_atoms(elements) #Elements still needs to be defined, farray is a function
-        atoms.pos[:,:] = farray([ [float(x) for x in row] \
-                                  for row in [field[1:4] for field in field_list]]).T
-        return atoms
+    ## For now - not sure how to deal with atomic_nubmer; field_list is overwritten and everything looks sketchy anyway.
+    # def to_atoms(self):
+    #     #check if necessary input there & all makes sense
+    #     if self.has_key('GEOMETRY'):
+    #         block = self['geometry=']
+    #
+    #     #now create
+    #     atoms = Atoms(n=len(block))
+    #     field_list = [line.strip() for line in block]
+    #     field_list = [line.split() for line in block]
+    #
+    #     #Way this currently works any labels will be lost
+    #     #if want to use these for molecule specification
+    #     #will have to do something more clever
+    #     #label = re.compile('[0-9]')
+    #     #field_list = map(label.split, field_list[0])
+    #     elements = map(operator.itemgetter(0), field_list)
+    #
+    #     #Look up elements by atomic number
+    #     elements = [ not el.isdigit() and atomic_number(el) or el for el in elements ]
+    #
+    #     #Transfer positions to Atoms object
+    #     # Set the element and pos data
+    #     atoms.set_atoms(elements) #Elements still needs to be defined, farray is a function
+    #     atoms.pos[:,:] = farray([ [float(x) for x in row] \
+    #                               for row in [field[1:4] for field in field_list]]).T
+    #     return atoms
 
     def update_from_atoms(self, at, geomfile=None):
         #As this stands the atomic positions aren't actually updated, which is silly
@@ -357,16 +351,6 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
     energy_names['DF-HF'] = ["Energy"]
     #etc
     
-    ##### MODIFIED by E. Szekely, 31 MARCH 2017
-    ####                          22,24 MAY 2018
-    energy_names['DF-MP2-F12'] = ["total energy"]    
-    energy_names['MP2-F12'] = ["total energy"]    
-    energy_names['CCSD(T)-F12B'] = ["total energy"]
-    energy_names['LCCSD(T)-F12'] = ["total energy"]
-    energy_names['DF-LCCSD(T)-F12'] = ["total energy"]
-    #####
-
-    
     gradient_names = OrderedDict()
     gradient_names['CCSD(T)'] =[""]
     gradient_names['RKS'] =['RKS GRADIENT']
@@ -384,14 +368,6 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
     all_methods['CCSD(T)-F12']=["CCSD(T)-F12a","CCSD(T)-F12b"]
     all_methods['CCSD(T)']=["CCSD(T)"]
 
-    ##### MODIFIED by E. Szekely, 31 MARCH 2017
-    ####                          22,24 MAY 2018
-    all_methods['DF-MP2-F12']= ["MP2-F12/3C(F)"]    
-    all_methods['MP2-F12']= ["MP2-F12/3C(F)"]    
-    all_methods['CCSD(T)-F12B']=["CCSD(T)-F12b"]
-    all_methods['LCCSD(T)-F12']=["LCCSD(T)-F12"]
-    #####
-
     if energy_from is None:
         log.critical("don't know which energy to extract, use keyword energy_from with options "+str([all_methods[k] for k in iter(all_methods)]).replace('[','').replace(']',''))
 
@@ -399,18 +375,18 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
     calcs=[] #holds the keys for getting correct method, energy_name, gradient_name
     data_keys_upper = [key.upper() for key in datafile._keys]
     for key in all_methods._keys:
-       if key in data_keys_upper:
-           calcs.append(key)
+        if key in data_keys_upper:
+            calcs.append(key)
     dom = minidom.parse(xmlfile)    
 
-    elements=[]
-    position_matrix=[]
+    elements = []
+    position_matrix = []
     cml = dom.documentElement.getElementsByTagName('cml:atomArray')
 
     for l in cml[0].childNodes:
-        if l.nodeType== 1:
-            element=l.attributes['elementType'].value.encode('ascii','ignore')
-            elements.append(atomic_number(element))
+        if l.nodeType == 1:
+            element = l.attributes['elementType'].value.encode('ascii','ignore')
+            elements.append(atomic_numbers[element])
             posx = l.attributes['x3'].value.encode('ascii','ignore')
             posy = l.attributes['y3'].value.encode('ascii','ignore')
             posz = l.attributes['z3'].value.encode('ascii','ignore')
@@ -418,7 +394,7 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
     if cluster is None:
         cluster = Atoms(n=len(elements))
         cluster.set_atoms(elements)
-        position_matrix=farray(position_matrix).T
+        position_matrix = np.array(position_matrix).T
         if not 'ANGSTROM' in datafile._keys and not 'angstrom' in datafile._keys:
             position_matrix = position_matrix * (1.0/0.529177249)
         cluster.pos[:,:]=position_matrix
@@ -442,9 +418,9 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
                 while my_energy in cluster.params.iterkeys():
                     i_en+=1
                     my_energy='_'.join([energy_param_name,str(i_en)])
-                cluster.params[my_energy] = float(energy_param) * HARTREE
+                cluster.params[my_energy] = float(energy_param) * Hartree
                 if prop_method == energy_from:
-                    cluster.params['Energy']=float(energy_param) * HARTREE
+                    cluster.params['Energy']=float(energy_param) * Hartree
                     energy_found=True
             elif extract_dipole and prop_name=='Dipole moment':
                 dipole_param_name="_".join([prop_method,prop_name])
@@ -471,14 +447,14 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
                 force_matrix.remove([])
             except ValueError:
                 break
-        force_matrix = [[(-1.0 * HARTREE / BOHR) * float(j) for j in i]
+        force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                         for i in force_matrix]
        
-        cluster.force[:] =farray(force_matrix).T
+        cluster.force[:] = np.array(force_matrix).T
 
         if len(grads) != 1:
             for k in range(1,len(grads)):
-                my_force='force%s'%str(k+1)
+                my_force = 'force%s'%str(k+1)
                 force_matrix = grads[k].childNodes[0].data.split('\n')
                 force_matrix = [str(i).split() for i in force_matrix]
                 for i in force_matrix:
@@ -486,9 +462,9 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
                         force_matrix.remove([])
                     except ValueError:
                         break
-                force_matrix = [[(-1.0 * HARTREE / BOHR) * float(j) for j in i]
+                force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                                 for i in force_matrix]
-                cluster.add_property(my_force,farray(force_matrix).T)
+                cluster.add_property(my_force, np.array(force_matrix).T)
 
     return cluster
 

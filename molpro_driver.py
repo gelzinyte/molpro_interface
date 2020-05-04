@@ -35,8 +35,9 @@ from numpy import *
 from quippy import *
 from quippy import molpro
 from quippy.molpro import MolproDatafile
-from quippy.atoms import Atoms
-from quippy.io import AtomsReaders, AtomsWriters, atoms_reader
+
+from ase import Atoms
+# from quippy.io import AtomsReaders, AtomsWriters, atoms_reader ## NOT REQUIRED??
 
 # Set up logging
 log = logging.getLogger('molpro_driver')
