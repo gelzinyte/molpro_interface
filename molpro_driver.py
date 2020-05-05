@@ -97,7 +97,7 @@ if os.path.isfile(old_input_fname):
 
 # Template used for input file
 # need to allow option for this to be blank so long as append_lines was read
-if os.environ.has_key('MOLPRO_TEMPLATE'):
+if 'MOLPRO_TEMPLATE' in os.environ:
    MOLPRO_TEMPLATE = os.environ['MOLPRO_TEMPLATE']
 elif 'template' in calc_args_str:
    MOLPRO_TEMPLATE = calc_args_str['template']
@@ -113,7 +113,7 @@ if 'append_lines' in calc_args_str:
    del calc_args_str['append_lines']
    log.info(str(lines_to_append))
 # Command used to execute molpro, with a %s where seed name should go
-if os.environ.has_key('MOLPRO'):
+if 'MOLPRO' in os.environ:
    MOLPRO = os.environ['MOLPRO']
 elif 'molpro' in calc_args_str:
    MOLPRO = calc_args_str['molpro']
@@ -161,7 +161,7 @@ if os.path.splitext(MOLPRO_TEMPLATE)[1] != '.xml':
 
    except IOError:
       die("Can't open input file %s" % MOLPRO_TEMPLATE)
-   except ValueError, message:
+   except ValueError as message:
       die(str(message))
 
     # need to add XML handling here
