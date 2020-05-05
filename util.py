@@ -14,8 +14,11 @@ class ParamReaderMixin(object):
         return self.copy()
 
     def parse(self, s):
-        key_quoted_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*["\{\}]([^"\{\}]+)["\{\}e+-]\s*')
-        key_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*([-0-9A-Za-z_.:\[\]()e+-]+)\s*')
+        # why could some key_values and key_quoted_values end in -e???????
+        # key_quoted_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*(?:\'|["\{\}])([^"\{\}]+)(?:\'|["\{\}e+-])\s*')
+        key_quoted_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*(?:\'|["\{\}])([^"\{\}]+)(?:\'|["\{\}+-])\s*')
+        # key_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*([-0-9A-Za-z_.:\[\]()e+-]+)\s*')
+        key_value = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*=\s*([-0-9A-Za-z_.:\[\]()+-]+)\s*')
         key_re = re.compile(r'([A-Za-z_]+[A-Za-z0-9_]*)\s*')
 
         s = s.strip()
@@ -24,7 +27,7 @@ class ParamReaderMixin(object):
             # Match quoted string first, then fall through to plain key=value
             m = key_quoted_value.match(s)
             if m is None:
-                m = key_value.match(s)
+                m = key_value.match(s) # removes matched key=value pair
                 if m is not None:
                     s = key_value.sub('', s, 1)
                 else:
@@ -47,7 +50,7 @@ class ParamReaderMixin(object):
             # Try to convert to (list of) floats, ints
             try:
                 numvalue = []
-                for x in s.split(value):
+                for x in value.split():
                     if x.find('.') == -1:
                         numvalue.append(int(float(x)))
                     else:

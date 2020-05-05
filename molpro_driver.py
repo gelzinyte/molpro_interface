@@ -22,9 +22,10 @@
 # Support for CCSD(T)-F12 calculations needs work.
 
 # arguments:
+#                       paths should be either singly-quoted or {}'ed
 #   template,
 #   append_lines        extra lines to be appended to template; if needed
-#   molpro              Command used to execute molpro, with a %s where seed name should go
+#   molpro              Command used to execute molpro, with a %s where seed name should go;
 #   test_mode           If set to True, don't actually run MOLPRO
 #   working_dir         Working directory for MOLPRO. Set this to a local scratch directory if network file performance is poor.
 #   energy_from         defined in molpro.py: 'CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2', DF-RMP2', 'RKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF'
@@ -135,7 +136,7 @@ else:
     MOLPRO = '~/molpro %s'
 
 # If there's no %s, put seed name at end of string
-if MOLPRO[-2:]=='%s':
+if MOLPRO.find('%s') == -1:
     MOLPRO = MOLPRO + ' %s'
 
 # If set to True, don't actually run MOLPRO
