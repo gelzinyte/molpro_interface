@@ -91,7 +91,7 @@ class MolproDatafile(OrderedDict):
             else:
                 fields = line.split(separator,1)
             key = fields[0].upper()
-            if key not in self._keys:
+            if key not in self.keys():
                 self[key] = []
                 if len(fields) > 1 and fields[1] != '':
                     self[key].append(separator+fields[1])
@@ -100,7 +100,7 @@ class MolproDatafile(OrderedDict):
                     print('WARNING: CHANGING BASIS DOES UNPREDICTABLE THINGS')
                 n=2
                 testkey = key
-                while testkey in self._keys:  # find a key like charge#3 if charge and charge#2 are already taken
+                while testkey in self.keys():  # find a key like charge#3 if charge and charge#2 are already taken
                     testkey = key+"#%s" % n
                     n+=1
                 key = testkey
@@ -152,7 +152,7 @@ class MolproDatafile(OrderedDict):
                     line = re.sub('{',"",line).strip()
                     if line != "":
                         self.parse_line(line,current_key)
-                        current_key = self._keys[-1]
+                        current_key = list(self.keys())[-1]
                     else:
                         raise ValueError("Parse error in datafile: standalone open bracket")
                 else:
@@ -281,7 +281,7 @@ class MolproDatafile(OrderedDict):
             else:
                 datafile.write(shortkey+'\n')
 
-    ## For now - not sure how to deal with atomic_nubmer; field_list is overwritten and everything looks sketchy anyway.
+    # # For now - not sure how to deal with atomic_nubmer; field_list is overwritten and everything looks sketchy anyway.
     # def to_atoms(self):
     #     #check if necessary input there & all makes sense
     #     if self.has_key('GEOMETRY'):
