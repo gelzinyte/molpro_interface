@@ -47,7 +47,7 @@ class ParamReaderMixin(object):
             # Try to convert to (list of) floats, ints
             try:
                 numvalue = []
-                for x in string.split(value):
+                for x in s.split(value):
                     if x.find('.') == -1:
                         numvalue.append(int(float(x)))
                     else:

@@ -135,7 +135,7 @@ else:
     MOLPRO = '~/molpro %s'
 
 # If there's no %s, put seed name at end of string
-if MOLPRO.find('%s') == -1:
+if MOLPRO[-2:]=='%s':
     MOLPRO = MOLPRO + ' %s'
 
 # If set to True, don't actually run MOLPRO
