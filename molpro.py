@@ -372,8 +372,8 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
 
     #loop through datafile to look for methods.
     calcs=[] #holds the keys for getting correct method, energy_name, gradient_name
-    data_keys_upper = [key.upper() for key in datafile._keys]
-    for key in all_methods._keys:
+    data_keys_upper = [key.upper() for key in datafile.keys()]
+    for key in all_methods.keys():
         if key in data_keys_upper:
             calcs.append(key)
     dom = minidom.parse(xmlfile)    
@@ -384,59 +384,68 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
 
     for l in cml[0].childNodes:
         if l.nodeType == 1:
-            element = l.attributes['elementType'].value.encode('ascii','ignore')
-            elements.append(atomic_numbers[element])
+            # element = l.attributes['elementType'].value.encode('ascii','ignore')
+            element = l.attributes['elementType'].value
+            # elements.append(atomic_numbers[element])
+            elements.append(element)
             posx = l.attributes['x3'].value.encode('ascii','ignore')
             posy = l.attributes['y3'].value.encode('ascii','ignore')
             posz = l.attributes['z3'].value.encode('ascii','ignore')
             position_matrix.append([float(posx),float(posy),float(posz)])
+    # TODO fix this
     if cluster is None:
-        cluster = Atoms(n=len(elements))
-        cluster.set_atoms(elements)
+        # cluster = Atoms(n=len(elements))
+        # cluster.set_atoms(elements)
         position_matrix = np.array(position_matrix).T
-        if not 'ANGSTROM' in datafile._keys and not 'angstrom' in datafile._keys:
+        if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in datafile.keys():
             position_matrix = position_matrix * (1.0/0.529177249)
-        cluster.pos[:,:]=position_matrix
-        #note this leaves the lattice undefined
+        # cluster.pos[:,:]=position_matrix
+        # #note this leaves the lattice undefined
+
+        cluster = Atoms(elements, positions=position_matrix)
 
     #now look for each of these energies in xml file
     energy_found=False
     props = dom.documentElement.getElementsByTagName('property')
     for prop in props:
-        prop_name = prop.attributes['name'].value.encode('ascii','ignore')
-        prop_method = prop.attributes['method'].value.encode('ascii','ignore')
+        # prop_name = prop.attributes['name'].value.encode('ascii','ignore')
+        # prop_method = prop.attributes['method'].value.encode('ascii','ignore')
+        prop_name = prop.attributes['name'].value
+        prop_method = prop.attributes['method'].value
         for calc in calcs:
             if prop_name in energy_names[calc] and prop_method in all_methods[calc]:
                 energy_param_name="_".join([prop_method,prop_name])
                 energy_param_name=energy_param_name.replace(" ","_")
                 #log.info("found "+energy_param_name)
                 # dated routines for finding monomer pairs, triplets in Topology module
-                energy_param=prop.attributes['value'].value.encode('ascii','ignore')
+                # energy_param=prop.attributes['value'].value.encode('ascii','ignore')
+                energy_param = prop.attributes['value'].value
                 my_energy=energy_param_name
                 i_en=1
-                while my_energy in iter(cluster.params.keys()):
+                while my_energy in cluster.arrays.keys():
                     i_en+=1
                     my_energy='_'.join([energy_param_name,str(i_en)])
-                cluster.params[my_energy] = float(energy_param) * Hartree
+                cluster.info[my_energy] = float(energy_param) * Hartree
                 if prop_method == energy_from:
-                    cluster.params['Energy']=float(energy_param) * Hartree
+                    cluster.info['energy']=float(energy_param) * Hartree
                     energy_found=True
             elif extract_dipole and prop_name=='Dipole moment':
                 dipole_param_name="_".join([prop_method,prop_name])
                 dipole_param_name=dipole_param_name.replace(" ","_")
                 log.info("found dipole moment: "+dipole_param_name)
-                dipole_param=prop.attributes['value'].value.encode('ascii','ignore')
-                cluster.params[dipole_param_name]=dipole_param
+                dipole_param=prop.attributes['value']
+                cluster.arrays[dipole_param_name]=dipole_param
 
     if not energy_found:
-        log.critical("couldn't find energy from "+energy_from+" prop method : "+prop_method)
+        log.critical(f"couldn't find energy from {energy_from} prop method : {prop_method}")
                       
         
-                
+    # TODO come back to forces later
     # read gradients if requested
     if extract_forces:
-        if not cluster.has_property('force'):
-            cluster.add_property('force', 0.0, n_cols=3)
+        if not 'force' in cluster.arrays.keys():
+            # cluster.add_property('force', 0.0, n_cols=3)
+            cluster.arrays['force'] = np.zeros((1,3)) # suspicious - only 1x3 matrix? also 1d or 2d array?
 
         grads = dom.documentElement.getElementsByTagName('gradient')
         force_matrix = grads[0].childNodes[0].data.split('\n')
@@ -473,7 +482,7 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
     log = logging.getLogger('molpro_driver')
 
     #write datafile
-    datafile.write(stem)
+    datafile.write(stem + '_molpro_dfile')
 
     #check command line
     if not '%s' in molpro: molpro = molpro + ' %s'

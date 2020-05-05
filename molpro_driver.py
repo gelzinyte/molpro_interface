@@ -41,7 +41,7 @@ from util import parse_params
 
 # Set up logging
 log = logging.getLogger('molpro_driver')
-format = logging.Formatter('%(name)s %(levelname)-10s %(asctime)s %(message)s')
+format = logging.Formatter('%(name)s - %(levelname)-10s - %(asctime)s - %(message)s')
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
 handler.setFormatter(format)
@@ -64,13 +64,13 @@ class ParamError(Exception):
 # Save starting directory
 orig_dir = os.getcwd()
 
+if len(sys.argv) < 3:
+    die('%s usage: <xyzfile> <outputfile> [KEY=VALUE]...' % sys.argv[0])
+
 xyzfile = sys.argv[1]
 outfile = sys.argv[2]
 geom = "geom_plain.xyz"
-log.info("output to", outfile)
-
-if len(sys.argv) < 3:
-    die('{} usage: <xyzfile> <outputfile> [KEY=VALUE]...'.format(sys.argv[0]))
+log.info("output to %s", outfile)
 
 args_str = ''
 if len(sys.argv) > 3:
@@ -80,12 +80,12 @@ calc_args_str = parse_params(args_str)  # sits in util module, turns key=val pai
 # what if I made it so that you passed append_lines="hf;ccsd(t)-f12;angstrom etc etc separated by ';'"
 # then calc_args_str['append_lines'].split(';') makes a list of lines to be written.
 
-print("Using calc args: {!s:}".format(calc_args_str))
+print("Using calc args: {}".format(calc_args_str))
 
 stem = os.path.basename(xyzfile)
 stem_split = os.path.splitext(stem)
 if stem_split[1] == '.xyz':  # Remove extension
-    acstem = stem_split[0]
+    stem = stem_split[0]
 logfile = stem + ".log.xyz"
 
 # remove old input file, if it's there
@@ -169,7 +169,7 @@ if os.path.splitext(MOLPRO_TEMPLATE)[1] != '.xml':
     # need to add XML handling here
 
 # Read extended XYZ input file containing cluster
-cluster = read(xyzfile, index=':')
+cluster = read(xyzfile)  # just first conformation
 
 # remove old output file, if it's there
 if os.path.exists(outfile):
@@ -181,14 +181,16 @@ work_dir = os.path.join(WORKING_DIR, stem)
 if not os.path.isdir(work_dir):
     os.mkdir(work_dir)
 os.chdir(work_dir)
+shutil.copyfile(os.path.join(orig_dir, MOLPRO_TEMPLATE), os.path.join(orig_dir, work_dir, MOLPRO_TEMPLATE))
 
 if not BATCH_READ:
     # Load up old cluster, if it's there
-    old_cluster_fname = stem + '.xyz.old'
+    old_cluster_fname = stem + '_old.xyz'
     if os.path.exists(old_cluster_fname):
         log.info('found old cluster in file %s' % old_cluster_fname)
         try:
-            old_cluster = read(old_cluster_fname, index=":")
+            # only reads the first conformation
+            old_cluster = read(old_cluster_fname)
         except IOError:
             die('error opening old cluster file %s' % old_cluster_fname)
 
@@ -234,7 +236,7 @@ if not BATCH_READ:
 
     # check if FORCE keyword present
     extract_forces = False
-    if 'FORCE' in datafile._keys:
+    if 'FORCE' in datafile.keys():
         extract_forces = True
 
 # now invoke MolPro
@@ -247,7 +249,7 @@ cluster = molpro.read_xml_output(
     stem + '.xml', energy_from=ENERGY_FROM, extract_forces=extract_forces,
     datafile=datafile, cluster=cluster)
 
-oldxyzfile = stem + '.xyz.old'
+oldxyzfile = stem + '_old.xyz'
 # Save cluster for comparison with next time
 cluster.write(oldxyzfile, format='xyz')
 # Also append it to the log file
