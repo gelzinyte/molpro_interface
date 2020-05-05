@@ -70,7 +70,7 @@ class ParamReaderMixin(object):
 
             # Parse boolean values, e.g 'T' -> True, 'F' -> False, 'T T F' -> [True, True, False]
             if isinstance(value, str):
-                str_to_bool  = {'T':True, 'F':False}
+                str_to_bool  = {'T':True, 'F':False, 'True':True, 'False':False, 'true':True, 'false':False}
 
                 if len(value.split()) > 1:
                     if all([x in list(str_to_bool.keys()) for x in value.split() ]):
