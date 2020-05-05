@@ -11,9 +11,7 @@ from ase import Atoms
 from ase.units import Hartree, Bohr
 
 # TODO not sure what atomic_number equivalent is
-# from quippy.periodictable import atomic_number
 from ase.data import atomic_numbers
-# from quippy.atoms import make_lattice, get_lattice_params ## not needed?
 
 from collections import OrderedDict
 import xml.dom.minidom as minidom
@@ -79,7 +77,7 @@ class MolproDatafile(OrderedDict):
             else:
                 self[key][0] += (';' + line)
         else:
-            nonalpha = re.compile('[^a-zA-Z0-9()\-]')
+            nonalpha = re.compile('[^a-zA-Z0-9()\-]')  # '\-' works fine
             separator = re.findall(nonalpha,line)
 
             if len(separator) > 0:
