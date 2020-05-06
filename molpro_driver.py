@@ -193,11 +193,11 @@ if not os.path.isdir(work_dir):
     os.mkdir(work_dir)
 os.chdir(work_dir)
 #shutil.copyfile(os.path.join(orig_dir, MOLPRO_TEMPLATE), os.path.join(orig_dir, work_dir, MOLPRO_TEMPLATE))
-file_from = os.path.join(orig_dir, 'methane.inp')
-file_to = work_dir
-log.info("file_from: %s" % file_from)
-log.info("file_to: %s" % file_to)
-shutil.copyfile(os.path.join(orig_dir, 'methane'), os.path.join(work_dir, 'methane'))
+#file_from = os.path.join(orig_dir, 'methane.inp')
+#file_to = work_dir
+#log.info("file_from: %s" % file_from)
+#log.info("file_to: %s" % file_to)
+#shutil.copyfile(os.path.join(orig_dir, 'methane'), os.path.join(work_dir, 'methane'))
 
 if not BATCH_READ:
     # Load up old cluster, if it's there

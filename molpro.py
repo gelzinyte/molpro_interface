@@ -482,7 +482,7 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
     log = logging.getLogger('molpro_driver')
 
     #write datafile
-    #datafile.write(stem)
+    datafile.write(stem)
 
     #check command line
     if not '%s' in molpro: molpro = molpro + ' %s'
@@ -502,7 +502,6 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
         log.info('molpro command:')
         log.info(molpro % stem)
         os.system(molpro % stem)
-        #os.system(molpro % 'methane.inp')
 
         #    error = subprocess()
     got_error=False
