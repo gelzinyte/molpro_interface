@@ -482,7 +482,7 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
     log = logging.getLogger('molpro_driver')
 
     #write datafile
-    datafile.write(stem + '_molpro_dfile')
+    #datafile.write(stem)
 
     #check command line
     if not '%s' in molpro: molpro = molpro + ' %s'
@@ -496,8 +496,13 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
             os.remove(stem+'.out')
         except:
             pass
-
+       
+        log.info('contents of cwdir')
+        print(os.listdir())
+        log.info('molpro command:')
+        log.info(molpro % stem)
         os.system(molpro % stem)
+        #os.system(molpro % 'methane.inp')
 
         #    error = subprocess()
     got_error=False
