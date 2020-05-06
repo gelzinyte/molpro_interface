@@ -261,6 +261,9 @@ if not BATCH_READ and not BATCH_QUEUE:
         log.error('molpro run failed')
 
 log.info("Molpro run has finished")
+#shutil.copyfile(os.path.join(work_dir, stem+'.out'), os.path.join(orig_dir, stem+'.out'))
+#shutil.copyfile(os.path.join(work_dir, geom), os.path.join(orig_dir, geom))
+#shutil.copyfile(os.path.join(work_dir, stem), os.path.join(orig_dir, stem+'produced_input'))
 
 # parse the XML output for energy, forces
 cluster = molpro.read_xml_output(

@@ -497,11 +497,13 @@ def run_molpro(datafile, molpro, stem, test_mode=False):
         except:
             pass
        
-        log.info('contents of cwdir')
-        print(os.listdir())
-        log.info('molpro command:')
-        log.info(molpro % stem)
+        #log.info('contents of cwdir')
+        #print(os.listdir())
+        #log.info('molpro command:')
+        #log.info(molpro % stem)
         os.system(molpro % stem)
+        #log.info('contents of cwdir')
+        #print(os.listdir())
 
         #    error = subprocess()
     got_error=False
