@@ -1,0 +1,6 @@
+memory,500,m
+geomtyp=xyz
+geom=
+basis=6-31G
+rks,b3lyp
+force
