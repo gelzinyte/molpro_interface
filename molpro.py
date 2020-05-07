@@ -439,8 +439,8 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
     if not energy_found:
         log.critical(f"couldn't find energy from {energy_from} prop method : {prop_method}")
                       
-        
-    # TODO come back to forces later
+
+
     # read gradients if requested
     if extract_forces:
         if not 'force' in cluster.arrays.keys():
@@ -458,7 +458,8 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
         force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                         for i in force_matrix]
        
-        cluster.force[:] = np.array(force_matrix).T
+        cluster.arrays['forces'] = np.array(force_matrix)
+        # cluster.arrays['force'] = cluster.arrays['forces']
 
         if len(grads) != 1:
             for k in range(1,len(grads)):

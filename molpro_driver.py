@@ -270,7 +270,8 @@ cluster = molpro.read_xml_output(
     stem + '.xml', energy_from=ENERGY_FROM, extract_forces=extract_forces,
     datafile=datafile, cluster=cluster)
 
-cluster.set_cell([20, 20, 20])
+if (cluster.get_cell() == np.array([0, 0, 0])).all():
+    cluster.set_cell([20, 20, 20])
 
 oldxyzfile = stem + '_old.xyz'
 # Save cluster for comparison with next time
