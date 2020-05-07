@@ -270,6 +270,8 @@ cluster = molpro.read_xml_output(
     stem + '.xml', energy_from=ENERGY_FROM, extract_forces=extract_forces,
     datafile=datafile, cluster=cluster)
 
+cluster.set_cell([20, 20, 20])
+
 oldxyzfile = stem + '_old.xyz'
 # Save cluster for comparison with next time
 cluster.write(oldxyzfile, format='xyz')
@@ -280,4 +282,4 @@ logfile.writelines(oldxyzfile.readlines())
 
 # Finally change back to original working directory and write output file
 os.chdir(orig_dir)
-cluster.write(outfile, format='xyz')
+cluster.write(outfile, format='extxyz')
