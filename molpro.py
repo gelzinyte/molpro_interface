@@ -458,8 +458,8 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
         force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                         for i in force_matrix]
        
-        cluster.arrays['forces'] = np.array(force_matrix)
-        # cluster.arrays['force'] = cluster.arrays['forces']
+        cluster.arrays['force'] = np.array(force_matrix)
+        # cluster.arrays['forces'] = cluster.arrays['force']
 
         if len(grads) != 1:
             for k in range(1,len(grads)):
@@ -473,7 +473,7 @@ def read_xml_output(xmlfile,energy_from=None, extract_forces=False, extract_dipo
                         break
                 force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                                 for i in force_matrix]
-                cluster.add_property(my_force, np.array(force_matrix).T)
+                cluster.arrays[my_force] = np.array(force_matrix)
 
     return cluster
 
