@@ -3,3 +3,7 @@ QUIP_py2/
 example/filepot*
 example/FilePot*
 test_runs/
+tightbind.parms.DFTB.mio-0-1.xml
+test_parse_xml.py
+.idea/
+__pycache__/
