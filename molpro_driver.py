@@ -91,7 +91,7 @@ calc_args_str = parse_params(args_str)  # sits in util module, turns key=val pai
 # what if I made it so that you passed append_lines="hf;ccsd(t)-f12;angstrom etc etc separated by ';'"
 # then calc_args_str['append_lines'].split(';') makes a list of lines to be written.
 
-print("Using calc args: {}".format(calc_args_str))
+log.info("Using calc args: {}".format(calc_args_str))
 
 stem = os.path.basename(xyzfile)
 stem_split = os.path.splitext(stem)
