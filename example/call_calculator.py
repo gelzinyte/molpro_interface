@@ -5,12 +5,15 @@ import pdb
 
 # example of how to call molpro calculator
 
-calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver_tests/quippy_test/template_e_f.inp}',
+calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver/quippy_test/template_e_f.inp}',
               'molpro' : '{/opt/molpro/bin/molprop}',
               'energy_from' : 'RKS',
+              # 'append_lines' : None,
+              # 'test_mode' : False,
+              # 'working_dir' : {/scratch-ssd/eg475/tmp},
               'extract_forces' : True}
 
-molpro = Potential(args_str='FilePot command=/home/eg475/molpro_stuff/driver_tests/molpro_driver.py', calc_args=calc_args)
+molpro = Potential(args_str='FilePot command=/home/eg475/molpro_stuff/driver/molpro_driver.py', calc_args=calc_args)
 
 methane = read('methane.xyz')
 methane.set_calculator(molpro)
