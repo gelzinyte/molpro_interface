@@ -5,7 +5,7 @@ import pdb
 
 # example of how to call molpro calculator
 
-calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver/quippy_test/template_e_f.inp}',
+calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver/example/template_e_f.inp}',
               'molpro' : '{/opt/molpro/bin/molprop}',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
