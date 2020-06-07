@@ -28,7 +28,7 @@
 #   molpro              Command used to execute molpro, with a %s where seed name should go;
 #   test_mode           If set to True, don't actually run MOLPRO
 #   working_dir         Working directory for MOLPRO. Set this to a local scratch directory if network file performance is poor.
-#   energy_from         defined in molpro.py: 'CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2', DF-RMP2', 'RKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF'
+#   energy_from         defined in molpro_old.py: 'CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2', DF-RMP2', 'RKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF'
 #
 
 
@@ -42,8 +42,8 @@ import sys, string, os, os.path, shutil, glob, operator, xml.dom.minidom, loggin
 import numpy as np
 
 # TODO set normally once done
-import molpro
-from molpro import MolproDatafile
+import molpro_old
+from molpro_old import MolproDatafile
 
 from ase import Atoms
 from ase.io import read, write
@@ -169,7 +169,7 @@ BATCH_QUEUE = False
 if os.path.splitext(MOLPRO_TEMPLATE)[1] != '.xml':
     # Read template input file
     try:
-        datafile = molpro.MolproDatafile(MOLPRO_TEMPLATE)
+        datafile = molpro_old.MolproDatafile(MOLPRO_TEMPLATE)
         # datafile.write()
 
     except IOError:
@@ -257,7 +257,7 @@ if not BATCH_READ:
 
 # now invoke MolPro
 if not BATCH_READ and not BATCH_QUEUE:
-    if not molpro.run_molpro(datafile, MOLPRO, stem, test_mode=TEST_MODE):
+    if not molpro_old.run_molpro(datafile, MOLPRO, stem, test_mode=TEST_MODE):
         log.error('molpro run failed')
 
 log.info("Molpro run has finished")
@@ -266,7 +266,7 @@ log.info("Molpro run has finished")
 #shutil.copyfile(os.path.join(work_dir, stem), os.path.join(orig_dir, stem+'produced_input'))
 
 # parse the XML output for energy, forces
-cluster = molpro.read_xml_output(
+cluster = molpro_old.read_xml_output(
     stem + '.xml', energy_from=ENERGY_FROM, extract_forces=extract_forces,
     datafile=datafile, cluster=cluster)
 
