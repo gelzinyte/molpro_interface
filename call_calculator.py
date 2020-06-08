@@ -13,8 +13,11 @@ calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver/example/template_e_
               # 'working_dir' : {/scratch-ssd/eg475/tmp},
               'extract_forces' : True}
 
-molpro = Potential(args_str='FilePot command=/home/eg475/molpro_stuff/driver/molpro_driver.py', calc_args=calc_args)
+from molpro import Molpro
+print('Molpro imported')
 
-methane = read('methane.xyz')
-methane.set_calculator(molpro)
-print('finally calculated energy:', methane.get_potential_energy())
+# molpro = Potential(args_str='FilePot command=/home/eg475/molpro_stuff/driver/molpro_driver.py', calc_args=calc_args)
+
+# methane = read('methane.xyz')
+# methane.set_calculator(molpro)
+# print('finally calculated energy:', methane.get_potential_energy())
