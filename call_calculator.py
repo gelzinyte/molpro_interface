@@ -11,9 +11,17 @@ from molpro import Molpro
 
 # dftb = Potential(args_str='TB DFTB', param_filename=os.path.join(os.getcwd(), './tightbind.parms.DFTB.mio-0-1.xml'))
 
-# template_path='/home/eg475/molpro_stuff/driver/template_e_f.inp'
-template_path='/opt/project/template_e_f.inp'
-calc_args = { 'template' : '/opt/project/template_e_f.inp',
+
+# template_path='/opt/project/template_e_f.inp'
+
+
+template_path='/home/eg475/molpro_stuff/driver/template_e_f.inp'
+
+
+
+calc_args = { \
+              'template':'/home/eg475/molpro_stuff/driver/template_e_f.inp',
+              # 'template' : '/opt/project/template_e_f.inp',
               'molpro' : '{/opt/molpro/bin/molprop}',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
