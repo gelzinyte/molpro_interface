@@ -80,8 +80,7 @@ class Molpro(Calculator):
         # over from molpro_driver.py
         # -----------------------------------------------------------------------------------------
 
-        geom = 'molpro_input.xyz'
-        write(geom, self.atoms, 'xyz')
+
 
         # Set up logging
         log = logging.getLogger('molpro_driver')
@@ -96,36 +95,10 @@ class Molpro(Calculator):
 
         orig_dir = os.getcwd()
 
-        # if len(sys.argv) < 3:
-        #     die('%s usage: <xyzfile> <outputfile> [KEY=VALUE]...' % sys.argv[0], log, orig_dir)
-        #
-        # xyzfile = sys.argv[1]
-        # outfile = sys.argv[2]
-        # geom = "geom_plain.xyz"
-        # log.info("output to %s", outfile)
 
-        # args_str = ''
-        # if len(sys.argv) > 3:
-        #     args_str = ' '.join(sys.argv[3:])
 
-        # calc_args = parse_params(args_str)  # sits in util module, turns key=val pairs into dict
-        # what if I made it so that you passed append_lines="hf;ccsd(t)-f12;angstrom etc etc separated by ';'"
-        # then calc_args['append_lines'].split(';') makes a list of lines to be written.
 
-        # log.info("Using calc args: {}".format(calc_args))
 
-        # stem = os.path.basename(xyzfile)
-        # stem_split = os.path.splitext(stem)
-        # if stem_split[1] == '.xyz':  # Remove extension
-        #     stem = stem_split[0]
-        # logfile = stem + ".log.xyz"
-        #
-        # # remove old input file, if it's there
-        # old_input_fname = os.path.join(stem, stem)
-        # if os.path.isfile(old_input_fname):
-        #     os.remove(old_input_fname)
-
-        ## for above: have calc_args passed via initiate or calculate or both.
 
         # ----------------------------------------------------------------
         # Parameters
@@ -204,6 +177,9 @@ class Molpro(Calculator):
         if not os.path.isdir(work_dir):
             os.mkdir(work_dir)
         os.chdir(work_dir)
+
+        geom = 'molpro_input.xyz'
+        write(geom, self.atoms, 'xyz')
 
         # Read template into MolproDatafile object
         datafile = MolproDatafile(datafile=MOLPRO_TEMPLATE)

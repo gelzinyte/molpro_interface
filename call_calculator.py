@@ -22,10 +22,10 @@ template_path='/home/eg475/molpro_stuff/driver/template_e_f.inp'
 calc_args = { \
               'template':'/home/eg475/molpro_stuff/driver/template_e_f.inp',
               # 'template' : '/opt/project/template_e_f.inp',
-              'molpro' : '{/opt/molpro/bin/molprop}',
+              'molpro' : '/opt/molpro/bin/molprop',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
-              'test_mode' : True,
+              # 'test_mode' : True,
               # 'working_dir' : {/scratch-ssd/eg475/tmp},
               'extract_forces' : True}
 

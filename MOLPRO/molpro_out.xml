@@ -28,15 +28,15 @@
   <!--
  MEMORY,500,m
  GEOMTYP=xyz
- GEOM=geom_plain.xyz
- Including file /home/eg475/molpro_stuff/driver/example/filepot/geom_plain.xyz
+ GEOM=molpro_input.xyz
+ Including file /home/eg475/molpro_stuff/driver/MOLPRO/molpro_input.xyz
  BASIS=6-31G
  RKS,b3lyp
  FORCE
 
- Variables initialized (766), CPU time= 0.01 sec
- Commands  initialized (545), CPU time= 0.01 sec, 513 directives.
- Default parameters read. Elapsed time= 0.64 sec
+ Variables initialized (766), CPU time= 0.00 sec
+ Commands  initialized (545), CPU time= 0.02 sec, 513 directives.
+ Default parameters read. Elapsed time= 0.10 sec
 
  Checking input...
  Passed
@@ -51,7 +51,7 @@
 
  **********************************************************************************************************************************
  LABEL *                                                                                 
- Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version                             DATE: 08-Jun-20          TIME: 19:48:49  
+ Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version                             DATE: 08-Jun-20          TIME: 22:12:27  
  **********************************************************************************************************************************
 
  SHA1:             2c68d29c09da70e1723824271fadde4bcd5f07a0
@@ -151,7 +151,7 @@
  Memory used in sort:       0.56 MW
 
  SORT1 READ        7399. AND WROTE        3423. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.00 SEC
- SORT2 READ        3423. AND WROTE        3495. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.02 SEC
+ SORT2 READ        3423. AND WROTE        3495. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.01 SEC
 
  FILE SIZES:   FILE 1:     7.8 MBYTE,  FILE 4:     4.2 MBYTE,   TOTAL:     12.1 MBYTE
 
@@ -166,8 +166,8 @@
                                            T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER   
 
  PROGRAMS   *        TOTAL       INT
- CPU TIMES  *         0.17      0.03
- REAL TIME  *         1.66 SEC
+ CPU TIMES  *         0.16      0.03
+ REAL TIME  *         0.86 SEC
  DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
 
@@ -266,12 +266,12 @@
                                          GEOM     BASIS   MCVARS    GRID      RKS  
 
  PROGRAMS   *        TOTAL       RKS       INT
- CPU TIMES  *         0.60      0.42      0.03
- REAL TIME  *         3.29 SEC
+ CPU TIMES  *         0.59      0.43      0.03
+ REAL TIME  *         2.01 SEC
  DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
    -->
-   <time start="19:48:49" end="19:48:51" cpu="0.6" system="0.16" real="3.29"/>
+   <time start="22:12:27" end="22:12:28" cpu="0.59" system="0.16" real="2.01"/>
    <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
   </jobstep><!--
   --><jobstep command="FORCE" commandset="FORCES">
@@ -321,12 +321,12 @@
                                          GEOM     BASIS   MCVARS    GRID      RKS  
 
  PROGRAMS   *        TOTAL     FORCE       RKS       INT
- CPU TIMES  *         3.07      2.47      0.42      0.03
- REAL TIME  *         9.13 SEC
+ CPU TIMES  *         3.05      2.46      0.43      0.03
+ REAL TIME  *         7.63 SEC
  DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
    -->
-   <time start="19:48:51" end="19:48:57" cpu="2.47" system="3.14" real="5.84"/>
+   <time start="22:12:28" end="22:12:34" cpu="2.46" system="2.96" real="5.62"/>
    <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
   </jobstep><!--
 
@@ -335,7 +335,7 @@
  **********************************************************************************************************************************
  Variable memory released
   --><stm:metadataList>
-   <stm:metadata name="dc:date" content="2020-06-08T19:48:58+01:00"/>
+   <stm:metadata name="dc:date" content="2020-06-08T22:12:34+01:00"/>
    <stm:metadata name="dc:creator" content="E. Gelzinyte"/>
    <stm:metadata name="cmlm:insilico" content="Molpro"/>
   </stm:metadataList><!--
@@ -343,8 +343,8 @@
    <version major="2012" minor="1" SHA="2c68d29c09da70e1723824271fadde4bcd5f07a0"
      integer_bits="64" parallelism="serial">
     2012.1
-    <date year="2020" month="6" day="8" hour="19" minute="48" second="49">
-     2020-06-08T19:48:49
+    <date year="2020" month="6" day="8" hour="22" minute="12" second="27">
+     2020-06-08T22:12:27
     </date>
    </version>
    <licence id="csanyi"/>
@@ -367,8 +367,8 @@
   <input>
    <p> MEMORY,500,m </p>
    <p> GEOMTYP=xyz </p>
-   <p> GEOM=geom_plain.xyz </p>
-   <include file="/home/eg475/molpro_stuff/driver/example/filepot/geom_plain.xyz"/>
+   <p> GEOM=molpro_input.xyz </p>
+   <include file="/home/eg475/molpro_stuff/driver/MOLPRO/molpro_input.xyz"/>
    <p> BASIS=6-31G </p>
    <p> RKS,b3lyp </p>
    <p> FORCE </p>
