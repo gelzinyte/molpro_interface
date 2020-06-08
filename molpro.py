@@ -1,6 +1,7 @@
 # TODO add stuff like __all__, if __name__=='main', etc
 import sys, os, os.path, logging
 import numpy as np
+import ase
 from ase.io import read, write
 from ase.calculators.calculator import Calculator
 from ase.io.extxyz import key_val_dict_to_str
@@ -16,7 +17,7 @@ class Molpro(Calculator):
     # TODO implement virial, (stress, local_virial, local_energy, stresses, energies?)
 
 
-    def __init__(self, calc_args=None, work_dir='MOLPRO', calculation_always_required=False):
+    def __init__(self, calc_args=None, work_dir='MOLPRO', calculation_always_required=False, **kwargs):
         # TODO what other properties do I need??
 
         self.__name__ = 'Molpro'
@@ -26,7 +27,7 @@ class Molpro(Calculator):
         self.calculation_always_required = calculation_always_required # TODO why?, why here?
 
         # TODO quippy has more stuff in this initiate
-        Calculator.__init__(self)
+        Calculator.__init__(self, **kwargs)
 
         # TODO initialise class attributes (?) to None (??)
         self._work_dir = work_dir
@@ -39,6 +40,8 @@ class Molpro(Calculator):
         if not isinstance(calc_args, dict):
             raise TypeError('Please pass calc_args as dictionary, for now')
         self.calc_args = calc_args
+
+
 
     def calculate(self, atoms=None, properties=None, system_changes=None,
                   forces=None, virial=None, local_energy=None,
@@ -64,20 +67,22 @@ class Molpro(Calculator):
         Calculator.calculate(self, atoms, properties, system_changes)
 
         # TODO should check if calculation is required
-        args_str = self.calc_args
-        if calc_args is not None:
-            if isinstance(calc_args, dict):
-                calc_args = key_val_dict_to_str(calc_args)
-            args_str += ' ' + calc_args
-        if kwargs is not None:
-            args_str += ' ' + key_val_dict_to_str(kwargs)
+        # args_str = self.calc_args
+        # if calc_args is not None:
+        #     if isinstance(calc_args, dict):
+        #         calc_args = key_val_dict_to_str(calc_args)
+        #     args_str += ' ' + calc_args
+        # if kwargs is not None:
+        #     args_str += ' ' + key_val_dict_to_str(kwargs)
+
+        calc_args = self.calc_args
 
         # over from molpro_driver.py
         # -----------------------------------------------------------------------------------------
 
         geom = 'molpro_input.xyz'
         write(geom, self.atoms, 'xyz')
-    
+
         # Set up logging
         log = logging.getLogger('molpro_driver')
         format = logging.Formatter('%(name)s - %(levelname)-10s - %(asctime)s - %(message)s')
@@ -93,7 +98,7 @@ class Molpro(Calculator):
 
         # if len(sys.argv) < 3:
         #     die('%s usage: <xyzfile> <outputfile> [KEY=VALUE]...' % sys.argv[0], log, orig_dir)
-        # 
+        #
         # xyzfile = sys.argv[1]
         # outfile = sys.argv[2]
         # geom = "geom_plain.xyz"
@@ -130,7 +135,7 @@ class Molpro(Calculator):
         # need to allow option for this to be blank so long as append_lines was read
         if 'MOLPRO_TEMPLATE' in os.environ:
             MOLPRO_TEMPLATE = os.environ['MOLPRO_TEMPLATE']
-        elif 'template' in calc_args:
+        elif 'template' in calc_args.keys():
             MOLPRO_TEMPLATE = calc_args['template']
             del calc_args['template']
         else:
@@ -138,7 +143,7 @@ class Molpro(Calculator):
 
         # extra lines (if any) to be appended to the template file
         lines_to_append = []
-        if 'append_lines' in calc_args:
+        if 'append_lines' in calc_args.keys():
             log.info(calc_args['append_lines'])
             lines_to_append = calc_args['append_lines'].split(' ')
             del calc_args['append_lines']
@@ -146,7 +151,7 @@ class Molpro(Calculator):
         # Command used to execute molpro, with a %s where seed name should go
         if 'MOLPRO' in os.environ:
             MOLPRO = os.environ['MOLPRO']
-        elif 'molpro' in calc_args:
+        elif 'molpro' in calc_args.keys():
             MOLPRO = calc_args['molpro']
             del calc_args['molpro']
         else:
@@ -158,19 +163,19 @@ class Molpro(Calculator):
 
         # If set to True, don't actually run MOLPRO
         TEST_MODE = False
-        if 'test_mode' in calc_args:
+        if 'test_mode' in calc_args.keys():
             TEST_MODE = calc_args['test_mode']
             del calc_args['test_mode']
 
         # Working directory for MOLPRO. Set this to a local scratch
         # directory if network file performance is poor.
         WORKING_DIR = '.'
-        if 'working_dir' in calc_args:
+        if 'working_dir' in calc_args.keys():
             WORKING_DIR = calc_args['working_dir']
             del calc_args['working_dir']
 
         ENERGY_FROM = None
-        if 'energy_from' in calc_args:
+        if 'energy_from' in calc_args.keys():
             ENERGY_FROM = calc_args['energy_from']
             log.info("the energy of the frame is from " + ENERGY_FROM)
             del calc_args['energy_from']
