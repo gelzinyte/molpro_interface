@@ -9,7 +9,7 @@ calc_args = { 'template' : '{/home/eg475/molpro_stuff/driver/example/template_e_
               'molpro' : '{/opt/molpro/bin/molprop}',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
-              # 'test_mode' : False,
+              'test_mode' : True,
               # 'working_dir' : {/scratch-ssd/eg475/tmp},
               'extract_forces' : True}
 
