@@ -1,3 +1,4 @@
+import os
 from ase.io import read
 from quippy.potential import Potential
 from ase.io.extxyz import key_val_dict_to_str
@@ -5,7 +6,10 @@ import pdb
 
 # example of how to call molpro calculator
 
-template_path='/home/eg475/molpro_stuff/driver/template_e_f.inp'
+dftb = Potential(args_str='TB DFTB', param_filename=os.path.join(os.getcwd(), './tightbind.parms.DFTB.mio-0-1.xml'))
+
+# template_path='/home/eg475/molpro_stuff/driver/template_e_f.inp'
+template_path='/opt/project/template_e_f.inp'
 calc_args = { 'template' : f'{{{template_path}}}',
               'molpro' : '{/opt/molpro/bin/molprop}',
               'energy_from' : 'RKS',
@@ -23,7 +27,8 @@ from molpro import Molpro
 print('Molpro imported')
 
 methane = read('methane.xyz')
-methane.set_calculator(Molpro)
+# methane.set_calculator(Molpro)
+methane.set_calculator(dftb)
 print('calculator set')
 energy = methane.get_potential_energy()
-print(f'finally calculated energy: {energy}')
+# print(f'finally calculated energy: {energy}')

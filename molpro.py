@@ -38,6 +38,7 @@ class Molpro(Calculator):
         # self.calc_args = calc_args
         if not isinstance(calc_args, dict):
             raise TypeError('Please pass calc_args as dictionary, for now')
+        self.calc_args = calc_args
 
     def calculate(self, atoms=None, properties=None, system_changes=None,
                   forces=None, virial=None, local_energy=None,
