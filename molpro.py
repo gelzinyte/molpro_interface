@@ -1,6 +1,7 @@
 # TODO add stuff like __all__, if __name__=='main', etc
 import sys, os, os.path, logging
 import numpy as np
+from copy import deepcopy
 import ase
 from ase.io import read, write
 from ase.calculators.calculator import Calculator
@@ -62,7 +63,7 @@ class Molpro(Calculator):
         Calculator.calculate(self, atoms, properties, system_changes)
 
 
-        calc_args = self.calc_args
+        calc_args = deepcopy(self.calc_args)
 
         # over from molpro_driver.py
         # -----------------------------------------------------------------------------------------
@@ -77,6 +78,7 @@ class Molpro(Calculator):
         log.propagate = False
         log.level = logging.INFO
 
+        log.info("Using calc args: {}".format(key_val_dict_to_str(calc_args)))
 
         orig_dir = os.getcwd()
 
@@ -141,8 +143,7 @@ class Molpro(Calculator):
 
         # ----------------------------------------------------------------
 
-        # Debug:
-        print(MOLPRO_TEMPLATE)
+        # log.info("molpro template {}".format(MOLPRO_TEMPLATE))
         if os.path.splitext(MOLPRO_TEMPLATE)[1] != '.xml':
             # Read template input file
             try:
