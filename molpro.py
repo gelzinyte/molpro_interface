@@ -101,6 +101,7 @@ class Molpro(Calculator):
         log.propagate = False
         log.level = logging.INFO
 
+        log.disabled = True   # For now; somehow messages pile up in the cycle
         log.info("Using calc args: {}".format(key_val_dict_to_str(calc_args)))
 
         orig_dir = os.getcwd()
@@ -170,7 +171,7 @@ class Molpro(Calculator):
             os.mkdir(directory)
         os.chdir(directory)
 
-        geom = f'{self._label}_input.xyz'
+        geom = f'{label}_input.xyz'
         write(geom, self.atoms, 'xyz')
 
         # Read template into MolproDatafile object

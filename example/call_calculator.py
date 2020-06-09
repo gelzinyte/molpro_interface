@@ -12,14 +12,14 @@ from molpro import Molpro
 # example of how to call molpro calculator
 
 template_path='/home/eg475/molpro_stuff/driver/example/template_e_f.inp'
-
+# template_path = '/opt/project/example/template_e_f.inp'
 
 calc_args = { \
-              'template':'/home/eg475/molpro_stuff/driver/example/template_e_f.inp',
+              'template': template_path,
               'molpro' : '/opt/molpro/bin/molprop',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
-              # 'test_mode' : True,
+              #  'test_mode' : True,
               # 'working_dir' : {/scratch-ssd/eg475/tmp},
               'extract_forces' : True}
 
