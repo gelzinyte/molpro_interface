@@ -32,12 +32,21 @@ with open(template_path, 'r') as f:
 molpro=Molpro(calc_args=calc_args)
 
 
-
+print(os.getcwd())
 methane = read('methane.xyz')
-#methane.set_calculator(molpro)
-#energy = methane.get_potential_energy()
-#print(f'Methane energy: {energy}')
+methane.set_calculator(molpro)
+energy = methane.get_potential_energy()
+print(f'Methane energy: {energy}')
 
+
+print(os.getcwd())
+methane = read('methane.xyz')
+methane.set_calculator(Molpro(calc_args=calc_args))
+energy = methane.get_potential_energy()
+print(f'Methane energy: {energy}')
+
+
+"""
 print('timing more atoms')
 start = time.time()
 no_atoms = 8
@@ -53,3 +62,4 @@ for _ in range(no_atoms):
 print(f'Time: {(time.time()-start)/no_atoms} s/structure; {no_atoms} structures') 
 
 
+"""
