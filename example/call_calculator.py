@@ -16,7 +16,7 @@ template_path='/home/eg475/molpro_stuff/driver/example/template_e_f.inp'
 
 calc_args = { \
               'template': template_path,
-              'molpro' : '/opt/molpro/bin/molprop',
+              'molpro' : '/opt/molpro/bin/molpro',
               'energy_from' : 'RKS',
               # 'append_lines' : None,
               #  'test_mode' : True,

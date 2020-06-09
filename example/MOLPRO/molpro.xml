@@ -6,10 +6,10 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
  <!--
 
- Primary working directories    : /scratch/tmp/2140108.1.orinoco
- Secondary working directories  : /scratch/tmp/2140108.1.orinoco
+ Primary working directories    : /tmp/eg475
+ Secondary working directories  : /tmp/eg475
  Wavefunction directory         : /home/eg475/wfu/
- Main file repository           : /scratch/tmp/2140108.1.orinoco/
+ Main file repository           : /tmp/eg475/
 
  SHA1      : 2c68d29c09da70e1723824271fadde4bcd5f07a0
  ARCHNAME  : Linux/x86_64
@@ -19,12 +19,10 @@
  id        : csanyi
 
  Nodes     nprocs
- node23       8
- ga_uses_ma=false, calling ma_init with nominal heap.
- GA-space will be limited to   8.0 MW (determined by -G option)
+ womble       1
 
  Using customized tuning parameters: mindgm=4; mindgv=4; mindgc=1; mindgr=1; noblas=0; minvec=7
- default implementation of scratch files=sf  
+ default implementation of scratch files=df  
 
  --><job>
   <!--
@@ -36,9 +34,9 @@
  RKS,b3lyp
  FORCE
 
- Variables initialized (766), CPU time= 0.01 sec
+ Variables initialized (766), CPU time= 0.00 sec
  Commands  initialized (545), CPU time= 0.01 sec, 513 directives.
- Default parameters read. Elapsed time= 0.08 sec
+ Default parameters read. Elapsed time= 0.09 sec
 
  Checking input...
  Passed
@@ -53,7 +51,7 @@
 
  **********************************************************************************************************************************
  LABEL *                                                                                 
- Linux-3.2.0-67-generic/node23(x86_64) 64 bit mpp version                                DATE: 09-Jun-20          TIME: 14:39:25  
+ Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version                             DATE: 09-Jun-20          TIME: 17:29:38  
  **********************************************************************************************************************************
 
  SHA1:             2c68d29c09da70e1723824271fadde4bcd5f07a0
@@ -141,36 +139,33 @@
  Contracted 2-electron integrals neglected if value below      1.0D-11
  AO integral compression algorithm  1   Integral accuracy      1.0D-11
 
-     2.097 MB (compressed) written to integral file (100.0%)
-
-     Node minimum: 0.262 MB, node maximum: 0.262 MB
+     0.262 MB (compressed) written to integral file (100.0%)
 
 
- NUMBER OF SORTED TWO-ELECTRON INTEGRALS:       1520.     BUFFER LENGTH:  32768
- NUMBER OF SEGMENTS:   1  SEGMENT LENGTH:       1520      RECORD LENGTH: 524288
+ NUMBER OF SORTED TWO-ELECTRON INTEGRALS:      11781.     BUFFER LENGTH:  32768
+ NUMBER OF SEGMENTS:   1  SEGMENT LENGTH:      11781      RECORD LENGTH: 524288
 
- Memory used in sort:       0.56 MW
+ Memory used in sort:       0.57 MW
 
- SORT1 READ       16961. AND WROTE        1415. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.05 SEC
- SORT2 READ       10959. AND WROTE       11781. INTEGRALS IN      8 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.00 SEC
+ SORT1 READ       16961. AND WROTE       10959. INTEGRALS IN      1 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.00 SEC
+ SORT2 READ       10959. AND WROTE       11781. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.01 SEC
 
- Node minimum:        1406.  Node maximum:        1540. integrals
+ FILE SIZES:   FILE 1:     7.8 MBYTE,  FILE 4:     4.2 MBYTE,   TOTAL:     12.1 MBYTE
 
  OPERATOR DM      FOR CENTER  0  COORDINATES:    0.000000    0.000000    0.000000
 
 
  **********************************************************************************************************************************
  DATASETS  * FILE   NREC   LENGTH (MB)   RECORD NAMES
-              1      18        7.58       500      610      700      900      950      970     1000      129      960     1100   
+              1      19        7.66       500      610      700      900      950      970     1000      129      960     1100   
                                           VAR    BASINP    GEOM    SYMINP    ZMAT    AOBASIS   BASIS     P2S    ABASIS      S 
-                                         1400     1410     1200     1210     1080     1600     1650     1700   
-                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    OPER   
+                                         1400     1410     1200     1210     1080     1600     1650     1300     1700   
+                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER   
 
  PROGRAMS   *        TOTAL       INT
- CPU TIMES  *         0.15      0.03
- REAL TIME  *         0.81 SEC
- DISK USED  *        33.66 MB      
- GA USED    *         0.00 MB       (max)       0.00 MB       (current)
+ CPU TIMES  *         0.16      0.04
+ REAL TIME  *         0.85 SEC
+ DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
 
  Density functional group B3LYP=B88+DIRAC+LYP+VWN5
@@ -188,8 +183,8 @@
  Functional: LYP                       Factor:  0.8100
  Functional: VWN5                      Factor:  0.1900
  
- Generated new metagrid on record  1800.2 with target accuracy 1.0D-06 and 15852 points in CPU time    0.1
- Computed new grid on record 1800.1 in CPU time    0.1
+ Generated new metagrid on record  1800.2 with target accuracy 1.0D-06 and 15852 points in CPU time    0.3
+ Computed new grid on record 1800.1 in CPU time    0.3
    17462 words reserved for DFT integration
 
  PROGRAM * RKS-SCF (Restricted closed shell Kohn-Sham)     Authors: W. Meyer, H.-J. Werner, P.J. Knowles, 1993
@@ -222,7 +217,7 @@
 
  !RKS STATE 1.1 Energy                -40.474222543754
    --><property name="Energy" method="RKS" principal="true" stateSymmetry="1" stateNumber="1"
-     value="-40.4742225437543"/><!--
+     value="-40.4742225437542"/><!--
  Nuclear energy                        13.46174930
  One-electron energy                  -79.86640337
  Two-electron energy                   31.49050182
@@ -233,7 +228,7 @@
  Dipole moment /Debye                  -0.00613630    -0.01578172    -0.00301651
    --><property name="Dipole moment" method="RKS" principal="true" stateSymmetry="1"
      stateNumber="1"
-     value="-0.241436378966264E-02 -0.620941208543291E-02 -0.11868625348169E-02"/><!--
+     value="-0.241436378964757E-02 -0.620941208543935E-02 -0.118686253481462E-02"/><!--
 
  Orbital energies:
 
@@ -247,24 +242,22 @@
 
  **********************************************************************************************************************************
  DATASETS  * FILE   NREC   LENGTH (MB)   RECORD NAMES
-              1      19        7.58       500      610      700      900      950      970     1000      129      960     1100   
+              1      20        8.17       500      610      700      900      950      970     1000      129      960     1100   
                                           VAR    BASINP    GEOM    SYMINP    ZMAT    AOBASIS   BASIS     P2S    ABASIS      S 
-                                         1400     1410     1200     1210     1080     1600     1650     1700     1800   
-                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    OPER     GRID   
+                                         1400     1410     1200     1210     1080     1600     1650     1300     1700     1800   
+                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER     GRID   
 
               2       5        0.36       700     1000      520     1800     2100   
                                          GEOM     BASIS   MCVARS    GRID      RKS  
 
  PROGRAMS   *        TOTAL       RKS       INT
- CPU TIMES  *         0.37      0.22      0.03
- REAL TIME  *         2.08 SEC
- DISK USED  *        97.70 MB      
- SF USED    *         0.00 MB      
- GA USED    *         0.51 MB       (max)       0.51 MB       (current)
+ CPU TIMES  *         1.03      0.87      0.04
+ REAL TIME  *         3.57 SEC
+ DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
    -->
-   <time start="14:39:25" end="14:39:27" cpu="0.37" system="0.16" real="2.08"/>
-   <storage units="megabyte" memory="4001.84" sf="0.0" df="64.04" eaf="33.66" ga="0.51"/>
+   <time start="17:29:38" end="17:29:41" cpu="1.03" system="0.27" real="3.57"/>
+   <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
   </jobstep><!--
   --><jobstep command="FORCE" commandset="FORCES">
    <!--
@@ -293,7 +286,7 @@
 
  Nuclear force contribution to virial =        -0.031949943
    --><gradient name="RKS GRADIENT" stateSymmetry="1" stateNumber="1"
-     virial="-0.319499425826129E-01">
+     virial="-0.319499425826039E-01">
      -0.008614552963  -0.003849822798   0.014887590401
      -0.000294088385  -0.002650071152  -0.000990024320
       0.008739479058   0.008853923654  -0.009429206177
@@ -304,24 +297,22 @@
 
  **********************************************************************************************************************************
  DATASETS  * FILE   NREC   LENGTH (MB)   RECORD NAMES
-              1      19        7.58       500      610      700      900      950      970     1000      129      960     1100   
+              1      20        8.17       500      610      700      900      950      970     1000      129      960     1100   
                                           VAR    BASINP    GEOM    SYMINP    ZMAT    AOBASIS   BASIS     P2S    ABASIS      S 
-                                         1400     1410     1200     1210     1080     1600     1650     1700     1800   
-                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    OPER     GRID   
+                                         1400     1410     1200     1210     1080     1600     1650     1300     1700     1800   
+                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER     GRID   
 
               2       5        0.36       700     1000      520     1800     2100   
                                          GEOM     BASIS   MCVARS    GRID      RKS  
 
  PROGRAMS   *        TOTAL     FORCE       RKS       INT
- CPU TIMES  *         2.37      2.00      0.22      0.03
- REAL TIME  *         6.31 SEC
- DISK USED  *        97.70 MB      
- SF USED    *         0.00 MB      
- GA USED    *         0.51 MB       (max)       0.51 MB       (current)
+ CPU TIMES  *         3.63      2.60      0.87      0.04
+ REAL TIME  *         9.37 SEC
+ DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
    -->
-   <time start="14:39:27" end="14:39:31" cpu="2.0" system="2.04" real="4.23"/>
-   <storage units="megabyte" memory="4001.84" sf="0.0" df="64.04" eaf="33.66" ga="0.51"/>
+   <time start="17:29:41" end="17:29:47" cpu="2.6" system="3.0" real="5.8"/>
+   <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
   </jobstep><!--
 
         RKS-SCF 
@@ -329,32 +320,32 @@
  **********************************************************************************************************************************
  Variable memory released
   --><stm:metadataList>
-   <stm:metadata name="dc:date" content="2020-06-09T14:39:31+01:00"/>
+   <stm:metadata name="dc:date" content="2020-06-09T17:29:48+01:00"/>
    <stm:metadata name="dc:creator" content="E. Gelzinyte"/>
    <stm:metadata name="cmlm:insilico" content="Molpro"/>
   </stm:metadataList><!--
   --><platform>
    <version major="2012" minor="1" SHA="2c68d29c09da70e1723824271fadde4bcd5f07a0"
-     integer_bits="64" parallelism="mpp">
+     integer_bits="64" parallelism="serial">
     2012.1
-    <date year="2020" month="6" day="9" hour="14" minute="39" second="25">
-     2020-06-09T14:39:25
+    <date year="2020" month="6" day="9" hour="17" minute="29" second="38">
+     2020-06-09T17:29:38
     </date>
    </version>
    <licence id="csanyi"/>
-   <parallel processes="8" nodes="1" all_processes="8" openmp="1"/>
-   <machine hostname="node23" architecture="x86_64">
-    Linux-3.2.0-67-generic/node23(x86_64) 64 bit mpp version
-    <sysinfo name="cpu MHz" content="2599.983"/>
-    <sysinfo name="MemTotal" content="49383864 kB"/>
+   <parallel processes="1" nodes="1" all_processes="1" openmp="1"/>
+   <machine hostname="womble" architecture="x86_64">
+    Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version
+    <sysinfo name="cpu MHz" content="1998.000"/>
+    <sysinfo name="MemTotal" content="16435236 kB"/>
     <sysinfo name="vendor_id" content="GenuineIntel"/>
     <sysinfo name="cpu family" content="6"/>
-    <sysinfo name="model name" content="Intel(R) Xeon(R) CPU E5-2670 0 @ 2.60GHz"/>
+    <sysinfo name="model name" content="Intel(R) Xeon(R) CPU           E5345  @ 2.33GHz"/>
     <sysinfo name="flags"
-      content="fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx lahf_lm ida arat xsaveopt pln pts dtherm tpr_shadow vnmi flexpriority ept vpid"/>
-    <sysinfo name="MemTotal" content="49383864 kB"/>
-    <sysinfo name="cache size" content="20480 KB"/>
-    <sysinfo name="ncpu" content="32"/>
+      content="fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm dca lahf_lm dtherm tpr_shadow"/>
+    <sysinfo name="MemTotal" content="16435236 kB"/>
+    <sysinfo name="cache size" content="4096 KB"/>
+    <sysinfo name="ncpu" content="8"/>
    </machine>
   </platform><!--
   -->
