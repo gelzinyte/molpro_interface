@@ -1,5 +1,0 @@
-memory,500,m
-geomtyp=xyz
-geom=input.xyz
-basis=6-31G
-rks,b3lyp

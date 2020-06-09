@@ -1,0 +1,138 @@
+-- New Job --
+running script
+Molpro template:
+memory,500,m
+geomtyp=xyz
+geom=
+basis=6-31G
+rks,b3lyp
+force
+molpro_driver - INFO       - 2020-06-09 14:25:27,032 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:27,032 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=52428
+Methane energy: -1101.370182799384
+timing more atoms
+molpro_driver - INFO       - 2020-06-09 14:25:33,260 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:33,260 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:33,260 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:33,260 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=39340
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:25:40,198 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:40,198 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:40,198 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:40,199 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:40,199 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:40,199 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=47319
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:25:46,968 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:46,968 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:46,968 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:46,968 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:46,969 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:46,969 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:46,969 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:46,969 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=49789
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:25:54,880 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=57107
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:01,578 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=35481
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:10,642 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=33008
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:19,164 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=39204
+-1101.3596936742426
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,487 - Using calc args: template=/home/eg475/molpro_stuff/driver/example/template_e_f.inp molpro=/opt/molpro/bin/molprop energy_from=RKS extract_forces=T
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+molpro_driver - INFO       - 2020-06-09 14:26:27,488 - the energy of the frame is from RKS
+tmp = /home/eg475/pdir//opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe.p
+ Creating: host=node19, user=eg475,
+           file=/opt/molpro/molprop_2012_1_Linux_x86_64_i8/bin/molpro.exe, port=39918
+-1101.3596936742426
+Time: 7.604045927524567 s/structure; 8 structures
+-- The End--
