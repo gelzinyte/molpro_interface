@@ -32,11 +32,6 @@ class Molpro(Calculator):
         # TODO initialise class attributes (?) to None (??)
         self._work_dir = work_dir
         self.atoms = None
-        # if isinstance(calc_args, dict):
-        #     calc_args = key_val_dict_to_str(calc_args)
-        # elif calc_args is None:
-        #     calc_args = ""
-        # self.calc_args = calc_args
         if not isinstance(calc_args, dict):
             raise TypeError('Please pass calc_args as dictionary, for now')
         self.calc_args = calc_args
@@ -66,21 +61,11 @@ class Molpro(Calculator):
 
         Calculator.calculate(self, atoms, properties, system_changes)
 
-        # TODO should check if calculation is required
-        # args_str = self.calc_args
-        # if calc_args is not None:
-        #     if isinstance(calc_args, dict):
-        #         calc_args = key_val_dict_to_str(calc_args)
-        #     args_str += ' ' + calc_args
-        # if kwargs is not None:
-        #     args_str += ' ' + key_val_dict_to_str(kwargs)
 
         calc_args = self.calc_args
 
         # over from molpro_driver.py
         # -----------------------------------------------------------------------------------------
-
-
 
         # Set up logging
         log = logging.getLogger('molpro_driver')
@@ -94,11 +79,6 @@ class Molpro(Calculator):
 
 
         orig_dir = os.getcwd()
-
-
-
-
-
 
         # ----------------------------------------------------------------
         # Parameters
@@ -161,6 +141,8 @@ class Molpro(Calculator):
 
         # ----------------------------------------------------------------
 
+        # Debug:
+        print(MOLPRO_TEMPLATE)
         if os.path.splitext(MOLPRO_TEMPLATE)[1] != '.xml':
             # Read template input file
             try:
@@ -239,9 +221,6 @@ def die(message, log, orig_dir):
     log.critical(message)
     os.chdir(orig_dir)
     sys.exit(1)
-
-
-
 
 
 def _check_arg(arg):
