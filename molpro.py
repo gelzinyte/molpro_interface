@@ -11,9 +11,6 @@ from ase import Atoms
 from ase.units import Hartree, Bohr
 
 
-
-
-from util import parse_params
 # import molpro_old
 # from molpro_old import MolproDatafile
 

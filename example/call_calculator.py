@@ -1,10 +1,6 @@
-import os, sys, time
+import sys, time
 sys.path.append('/home/eg475/molpro_stuff/driver')
 from ase.io import read
-from quippy.potential import Potential
-from ase.io.extxyz import key_val_dict_to_str
-import pdb
-from ase.calculators.morse import MorsePotential
 from molpro import Molpro
 
 
