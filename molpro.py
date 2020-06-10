@@ -211,8 +211,8 @@ class Molpro(Calculator):
         os.chdir(orig_dir)
 
         self.results['energy'] = self.atoms.info['energy']
-        if 'force' in properties:
-            self.results['forces'] = np.copy(atoms.arrays['forces'])
+        if 'forces' in properties:
+        	self.results['forces'] = np.copy(self.atoms.arrays['forces'])
 
     def get_default_properties(self):
         return self._default_properties[:]
@@ -635,9 +635,9 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
 
     # read gradients if requested
     if extract_forces:
-        if not 'force' in cluster.arrays.keys():
+        if not 'forces' in cluster.arrays.keys():
             # cluster.add_property('force', 0.0, n_cols=3)
-            cluster.arrays['force'] = np.zeros((1, 3))  # suspicious - only 1x3 matrix? also 1d or 2d array?
+            cluster.arrays['forces'] = np.zeros((1, 3))  # suspicious - only 1x3 matrix? also 1d or 2d array?
 
         grads = dom.documentElement.getElementsByTagName('gradient')
         force_matrix = grads[0].childNodes[0].data.split('\n')
@@ -650,12 +650,12 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
         force_matrix = [[(-1.0 * Hartree / Bohr) * float(j) for j in i]
                         for i in force_matrix]
 
-        cluster.arrays['force'] = np.array(force_matrix)
+        cluster.arrays['forces'] = np.array(force_matrix)
         # cluster.arrays['forces'] = cluster.arrays['force']
 
         if len(grads) != 1:
             for k in range(1, len(grads)):
-                my_force = 'force%s' % str(k + 1)
+                my_force = 'forces%s' % str(k + 1)
                 force_matrix = grads[k].childNodes[0].data.split('\n')
                 force_matrix = [str(i).split() for i in force_matrix]
                 for i in force_matrix:
