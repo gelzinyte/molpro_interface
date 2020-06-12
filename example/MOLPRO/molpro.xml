@@ -34,9 +34,9 @@
  RKS,b3lyp
  FORCE
 
- Variables initialized (766), CPU time= 0.00 sec
+ Variables initialized (766), CPU time= 0.01 sec
  Commands  initialized (545), CPU time= 0.01 sec, 513 directives.
- Default parameters read. Elapsed time= 0.09 sec
+ Default parameters read. Elapsed time= 0.10 sec
 
  Checking input...
  Passed
@@ -51,7 +51,7 @@
 
  **********************************************************************************************************************************
  LABEL *                                                                                 
- Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version                             DATE: 09-Jun-20          TIME: 17:29:38  
+ Linux-3.2.0-67-generic/womble(x86_64) 64 bit serial version                             DATE: 12-Jun-20          TIME: 23:32:01  
  **********************************************************************************************************************************
 
  SHA1:             2c68d29c09da70e1723824271fadde4bcd5f07a0
@@ -86,11 +86,11 @@
 
    --><cml:symmetry pointGroup="C1"/><!--
    --><cml:atomArray>
-    <cml:atom id="a1" elementType="C" x3="0.496714E-02" y3="-0.138264E-02" z3="0.647689E-02"/>
-    <cml:atom id="a2" elementType="H" x3="0.64389381" y3="0.62632198" z3="0.62632214"/>
-    <cml:atom id="a3" elementType="H" x3="-0.61287138" y3="-0.62098916" z3="0.62396877"/>
-    <cml:atom id="a4" elementType="H" x3="0.63408911" y3="-0.63329769" z3="-0.63332081"/>
-    <cml:atom id="a5" elementType="H" x3="-0.62624389" y3="0.60953071" z3="-0.64591269"/>
+    <cml:atom id="a1" elementType="C" x3="-0.215013E-02" y3="0.468316E-02" z3="0.1055699E-01"/>
+    <cml:atom id="a2" elementType="H" x3="0.61572066" y3="0.6370874" z3="0.62732772"/>
+    <cml:atom id="a3" elementType="H" x3="-0.6341144" y3="-0.62140151" z3="0.62334395"/>
+    <cml:atom id="a4" elementType="H" x3="0.62129137" y3="-0.6339289" z3="-0.62166042"/>
+    <cml:atom id="a5" elementType="H" x3="-0.63440437" y3="0.64123784" z3="-0.63091956"/>
    </cml:atomArray><!--
    --><cml:bondArray>
     <cml:bond atomRefs2="a1 a2"/>
@@ -103,22 +103,22 @@
 
  NR  ATOM    CHARGE       X              Y              Z
 
-   1  C       6.00    0.009386534   -0.002612811    0.012239548
-   2  H       1.00    1.216782959    1.183577012    1.183577315
-   3  H       1.00   -1.158159062   -1.173499443    1.179130090
-   4  H       1.00    1.198254761   -1.196759194   -1.196802884
-   5  H       1.00   -1.183429444    1.151846111   -1.220598089
+   1  C       6.00   -0.004063157    0.008849890    0.019949820
+   2  H       1.00    1.163543421    1.203920708    1.185477585
+   3  H       1.00   -1.198302552   -1.174278672    1.177949351
+   4  H       1.00    1.174070537   -1.197952008   -1.174767941
+   5  H       1.00   -1.198850516    1.211763903   -1.192265179
 
  Bond lengths in Bohr (Angstrom)
 
- 1-2  2.058369400  1-3  2.023801314  1-4  2.073927879  1-5  2.067721934
-     ( 1.089242174)     ( 1.070949531)     ( 1.097475367)     ( 1.094191322)
+ 1-2  2.037143675  1-3  2.041314243  1-4  2.066814057  1-5  2.084222675
+     ( 1.078010004)     ( 1.080216974)     ( 1.093710894)     ( 1.102923138)
 
  Bond angles
 
-  2-1-3  110.10245303   2-1-4  109.10543218   2-1-5  110.85012538   3-1-4  109.49432128
+  2-1-3  110.53418266   2-1-4  110.27616168   2-1-5  108.82921143   3-1-4  108.84318680
 
-  3-1-5  109.51150984   4-1-5  107.73301888
+  3-1-5  109.21288414   4-1-5  109.12092604
 
  NUCLEAR CHARGE:                   10
  NUMBER OF PRIMITIVE AOS:          38
@@ -128,12 +128,12 @@
  NUMBER OF VALENCE ORBITALS:        8   (   8A   )
 
 
- NUCLEAR REPULSION ENERGY   13.46174930
+ NUCLEAR REPULSION ENERGY   13.45233927
 
 
  Eigenvalues of metric
 
-         1 0.204E-01 0.718E-01 0.736E-01 0.767E-01 0.387E+00 0.414E+00 0.417E+00 0.419E+00
+         1 0.204E-01 0.717E-01 0.744E-01 0.765E-01 0.387E+00 0.415E+00 0.418E+00 0.418E+00
 
 
  Contracted 2-electron integrals neglected if value below      1.0D-11
@@ -147,8 +147,8 @@
 
  Memory used in sort:       0.57 MW
 
- SORT1 READ       16961. AND WROTE       10959. INTEGRALS IN      1 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.00 SEC
- SORT2 READ       10959. AND WROTE       11781. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.01 SEC
+ SORT1 READ       16961. AND WROTE       10959. INTEGRALS IN      1 RECORDS. CPU TIME:     0.00 SEC, REAL TIME:     0.01 SEC
+ SORT2 READ       10959. AND WROTE       11781. INTEGRALS IN      1 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.01 SEC
 
  FILE SIZES:   FILE 1:     7.8 MBYTE,  FILE 4:     4.2 MBYTE,   TOTAL:     12.1 MBYTE
 
@@ -163,8 +163,8 @@
                                            T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER   
 
  PROGRAMS   *        TOTAL       INT
- CPU TIMES  *         0.16      0.04
- REAL TIME  *         0.85 SEC
+ CPU TIMES  *         0.19      0.05
+ REAL TIME  *         0.93 SEC
  DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
 
@@ -183,7 +183,7 @@
  Functional: LYP                       Factor:  0.8100
  Functional: VWN5                      Factor:  0.1900
  
- Generated new metagrid on record  1800.2 with target accuracy 1.0D-06 and 15852 points in CPU time    0.3
+ Generated new metagrid on record  1800.2 with target accuracy 1.0D-06 and 15822 points in CPU time    0.3
  Computed new grid on record 1800.1 in CPU time    0.3
    17462 words reserved for DFT integration
 
@@ -204,40 +204,40 @@
  Molecular orbital dump at record        2100.2
 
  ITERATION    DDIFF          GRAD             ENERGY        2-EL.EN.            DIPOLE MOMENTS         DIIS   ORB.
-    1      0.000D+00      0.000D+00       -40.39440506     66.440584    0.01106   -0.00517   -0.02961    0    start
-    2      0.000D+00      0.351D-01       -40.37327082     59.314413   -0.01787   -0.00505    0.03393    1    diag
-    3      0.667D-01      0.385D-01       -40.47421227     63.015255   -0.00217   -0.00646   -0.00202    2    diag
-    4      0.359D-01      0.321D-03       -40.47422236     62.976199   -0.00244   -0.00615   -0.00104    3    diag
-    5      0.696D-03      0.532D-04       -40.47422254     62.980828   -0.00241   -0.00623   -0.00122    4    diag
-    6      0.438D-04      0.270D-05       -40.47422254     62.980998   -0.00242   -0.00620   -0.00118    5    diag
-    7      0.334D-05      0.323D-06       -40.47422254     62.981004   -0.00241   -0.00621   -0.00119    6    diag
-    8      0.502D-06      0.807D-08       -40.47422254     62.981004   -0.00241   -0.00621   -0.00119    0    orth
+    1      0.000D+00      0.000D+00       -40.39468833     66.418223   -0.01208    0.00259   -0.02454    0    start
+    2      0.000D+00      0.351D-01       -40.37344886     59.298335    0.01313   -0.00567    0.03513    1    diag
+    3      0.666D-01      0.385D-01       -40.47430893     62.997217   -0.00125   -0.00124    0.00217    2    diag
+    4      0.359D-01      0.321D-03       -40.47431902     62.958154   -0.00084   -0.00132    0.00289    3    diag
+    5      0.695D-03      0.532D-04       -40.47431920     62.962793   -0.00092   -0.00131    0.00278    4    diag
+    6      0.434D-04      0.244D-05       -40.47431920     62.962958   -0.00090   -0.00131    0.00280    5    diag
+    7      0.278D-05      0.223D-06       -40.47431920     62.962961   -0.00090   -0.00131    0.00280    6    diag
+    8      0.356D-06      0.100D-07       -40.47431920     62.962961   -0.00090   -0.00131    0.00280    0    orth
 
  Final occupancy:   5
 
- !RKS STATE 1.1 Energy                -40.474222543754
+ !RKS STATE 1.1 Energy                -40.474319196686
    --><property name="Energy" method="RKS" principal="true" stateSymmetry="1" stateNumber="1"
-     value="-40.4742225437542"/><!--
- Nuclear energy                        13.46174930
- One-electron energy                  -79.86640337
- Two-electron energy                   31.49050182
- SCF exchange energy                   -6.58026990     Factor= 0.2000
- Density functional                    -5.56007029     B88=-6.57916867 DIRAC=-5.89518456 LYP=-0.29460297 VWN5=-0.59381935
- Virial quotient                       -1.00520931
- !RKS STATE 1.1 Dipole moment          -0.00241436    -0.00620941    -0.00118686
- Dipole moment /Debye                  -0.00613630    -0.01578172    -0.00301651
+     value="-40.4743191966857"/><!--
+ Nuclear energy                        13.45233927
+ One-electron energy                  -79.84892618
+ Two-electron energy                   31.48148031
+ SCF exchange energy                   -6.57913765     Factor= 0.2000
+ Density functional                    -5.55921261     B88=-6.57815846 DIRAC=-5.89418464 LYP=-0.29455498 VWN5=-0.59375900
+ Virial quotient                       -1.00531163
+ !RKS STATE 1.1 Dipole moment          -0.00090107    -0.00130885     0.00279835
+ Dipole moment /Debye                  -0.00229013    -0.00332654     0.00711223
    --><property name="Dipole moment" method="RKS" principal="true" stateSymmetry="1"
      stateNumber="1"
-     value="-0.241436378964757E-02 -0.620941208543935E-02 -0.118686253481462E-02"/><!--
+     value="-0.901067091637259E-03 -0.130884541292997E-02 0.279834808932936E-02"/><!--
 
  Orbital energies:
 
          1.1          2.1          3.1          4.1          5.1          6.1          7.1
-    -10.154225    -0.691066    -0.390576    -0.389101    -0.382232     0.121528     0.176613
+    -10.154540    -0.690817    -0.391541    -0.386353    -0.383672     0.121346     0.176639
 
- HOMO      5.1    -0.382232 =     -10.4011eV
- LUMO      6.1     0.121528 =       3.3070eV
- LUMO-HOMO         0.503760 =      13.7080eV
+ HOMO      5.1    -0.383672 =     -10.4402eV
+ LUMO      6.1     0.121346 =       3.3020eV
+ LUMO-HOMO         0.505018 =      13.7422eV
 
 
  **********************************************************************************************************************************
@@ -251,12 +251,12 @@
                                          GEOM     BASIS   MCVARS    GRID      RKS  
 
  PROGRAMS   *        TOTAL       RKS       INT
- CPU TIMES  *         1.03      0.87      0.04
- REAL TIME  *         3.57 SEC
+ CPU TIMES  *         1.07      0.88      0.05
+ REAL TIME  *         2.88 SEC
  DISK USED  *        12.40 MB      
  **********************************************************************************************************************************
    -->
-   <time start="17:29:38" end="17:29:41" cpu="1.03" system="0.27" real="3.57"/>
+   <time start="23:32:01" end="23:32:03" cpu="1.07" system="0.22" real="2.88"/>
    <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
   </jobstep><!--
   --><jobstep command="FORCE" commandset="FORCES">
@@ -271,65 +271,20 @@
 
  Number of electrons= 10     Singlet     Space symmetry=1      Wavefunction type: CLOSED          
 
-
- DFT GRADIENT, EXFAC=     0.200
-
- RKS GRADIENT FOR STATE 1.1
-
- Atom          dE/dx               dE/dy               dE/dz
-
-   1        -0.008614553        -0.003849823         0.014887590
-   2        -0.000294088        -0.002650071        -0.000990024
-   3         0.008739479         0.008853924        -0.009429206
-   4         0.000444132        -0.000293579        -0.002304024
-   5        -0.000274970        -0.002060451        -0.002164336
-
- Nuclear force contribution to virial =        -0.031949943
-   --><gradient name="RKS GRADIENT" stateSymmetry="1" stateNumber="1"
-     virial="-0.319499425826039E-01">
-     -0.008614552963  -0.003849822798   0.014887590401
-     -0.000294088385  -0.002650071152  -0.000990024320
-      0.008739479058   0.008853923654  -0.009429206177
-      0.000444132403  -0.000293578929  -0.002304023913
-     -0.000274970113  -0.002060450776  -0.002164335991
-   </gradient><!--
-
-
- **********************************************************************************************************************************
- DATASETS  * FILE   NREC   LENGTH (MB)   RECORD NAMES
-              1      20        8.17       500      610      700      900      950      970     1000      129      960     1100   
-                                          VAR    BASINP    GEOM    SYMINP    ZMAT    AOBASIS   BASIS     P2S    ABASIS      S 
-                                         1400     1410     1200     1210     1080     1600     1650     1300     1700     1800   
-                                           T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER     GRID   
-
-              2       5        0.36       700     1000      520     1800     2100   
-                                         GEOM     BASIS   MCVARS    GRID      RKS  
-
- PROGRAMS   *        TOTAL     FORCE       RKS       INT
- CPU TIMES  *         3.63      2.60      0.87      0.04
- REAL TIME  *         9.37 SEC
- DISK USED  *        12.40 MB      
- **********************************************************************************************************************************
-   -->
-   <time start="17:29:41" end="17:29:47" cpu="2.6" system="3.0" real="5.8"/>
-   <storage units="megabyte" memory="4001.84" sf="0.0" df="12.4" eaf="0.0"/>
-  </jobstep><!--
-
-        RKS-SCF 
-    -40.47422254
- **********************************************************************************************************************************
- Variable memory released
-  --><stm:metadataList>
-   <stm:metadata name="dc:date" content="2020-06-09T17:29:48+01:00"/>
+   --><error/><!--
+  --></jobstep><!--
+  -->
+  <stm:metadataList>
+   <stm:metadata name="dc:date" content="2020-06-12T23:32:04+01:00"/>
    <stm:metadata name="dc:creator" content="E. Gelzinyte"/>
    <stm:metadata name="cmlm:insilico" content="Molpro"/>
-  </stm:metadataList><!--
-  --><platform>
+  </stm:metadataList>
+  <platform>
    <version major="2012" minor="1" SHA="2c68d29c09da70e1723824271fadde4bcd5f07a0"
      integer_bits="64" parallelism="serial">
     2012.1
-    <date year="2020" month="6" day="9" hour="17" minute="29" second="38">
-     2020-06-09T17:29:38
+    <date year="2020" month="6" day="12" hour="23" minute="32" second="1">
+     2020-06-12T23:32:01
     </date>
    </version>
    <licence id="csanyi"/>
@@ -347,8 +302,7 @@
     <sysinfo name="cache size" content="4096 KB"/>
     <sysinfo name="ncpu" content="8"/>
    </machine>
-  </platform><!--
-  -->
+  </platform>
   <input>
    <p> MEMORY,500,m </p>
    <p> GEOMTYP=xyz </p>
