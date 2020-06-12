@@ -1,13 +1,18 @@
 # TODO add stuff like __all__, if __name__=='main', etc
-import sys, os, os.path, logging, re
-import numpy as np
-from copy import deepcopy
-from ase.io import write
-from ase.calculators.calculator import Calculator
-from ase.io.extxyz import key_val_dict_to_str
+import logging
+import os
+import os.path
+import re
+import sys
 from collections import OrderedDict, abc
+from copy import deepcopy
+
+import numpy as np
 import xml.dom.minidom as minidom
 from ase import Atoms
+from ase.calculators.calculator import Calculator
+from ase.io import write
+from ase.io.extxyz import key_val_dict_to_str
 from ase.units import Hartree, Bohr
 
 
@@ -38,7 +43,6 @@ class Molpro(Calculator):
 
     """
 
-
     # TODO implement virial, (stress, local_virial, local_energy, stresses, energies?)
 
     def __init__(self, calc_args=None, directory='MOLPRO', label='molpro', atoms=None, \
@@ -48,7 +52,7 @@ class Molpro(Calculator):
 
         # TODO set to only energy being default, as that only may be necessary sometimes
         self._default_properties = ['energy', 'forces']
-        self.calculation_always_required = calculation_always_required # TODO why?, why here?
+        self.calculation_always_required = calculation_always_required  # TODO why?, why here?
 
         Calculator.__init__(self, restart=None, ignore_bad_restart_file=False, label=None, atoms=atoms, **kwargs)
 
@@ -63,8 +67,6 @@ class Molpro(Calculator):
         if not isinstance(calc_args, dict):
             raise TypeError('Please pass calc_args as dictionary, for now')
         self.calc_args = deepcopy(calc_args)
-
-
 
     def calculate(self, atoms=None, properties=None, system_changes=None):
         # TODO what's up with system_changes, etc
@@ -98,7 +100,7 @@ class Molpro(Calculator):
         log.propagate = False
         log.level = logging.INFO
 
-        log.disabled = True   # For now; somehow messages pile up in the cycle
+        log.disabled = True  # For now; somehow messages pile up in the cycle
         log.info("Using calc args: {}".format(key_val_dict_to_str(calc_args)))
 
         orig_dir = os.getcwd()
@@ -111,7 +113,6 @@ class Molpro(Calculator):
         # need to allow option for this to be blank so long as append_lines was read
         MOLPRO_TEMPLATE = calc_args['template']
         del calc_args['template']
-
 
         # extra lines (if any) to be appended to the template file
         lines_to_append = []
@@ -138,7 +139,6 @@ class Molpro(Calculator):
         if 'test_mode' in calc_args.keys():
             TEST_MODE = calc_args['test_mode']
             del calc_args['test_mode']
-
 
         ENERGY_FROM = None
         if 'energy_from' in calc_args.keys():
@@ -212,7 +212,7 @@ class Molpro(Calculator):
 
         self.results['energy'] = self.atoms.info['energy']
         if 'forces' in properties:
-        	self.results['forces'] = np.copy(self.atoms.arrays['forces'])
+            self.results['forces'] = np.copy(self.atoms.arrays['forces'])
 
     def get_default_properties(self):
         return self._default_properties[:]
@@ -520,8 +520,10 @@ class MolproDatafile(OrderedDict):
 
 def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dipole=False, datafile=None, cluster=None):
     # parse an xml output file and return cluster with updated info
-    # datafile tells which energies, forces to look for, cluster Atoms object which gets returned, this is echoed in the xml file so can be left out
-    # If extract_forces is not given and the FORCE keyword is found in datafile, the default is to set extract_forces=True
+    # datafile tells which energies, forces to look for, cluster Atoms object which gets returned,
+    # this is echoed in the xml file so can be left out
+    # If extract_forces is not given and the FORCE keyword is found in datafile,
+    # the default is to set extract_forces=True
 
     log = logging.getLogger('molpro_driver')
 
@@ -537,6 +539,7 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
     energy_names['DF-MP2'] = ["total energy"]
     energy_names['DF-RMP2'] = ["energy"]
     energy_names['RKS'] = ["Energy"]
+    energy_names['UKS'] = ["Energy"]
     energy_names['RHF'] = ["Energy"]
     energy_names['DF-RHF'] = ["Energy"]
     energy_names['HF'] = ["Energy"]
@@ -546,6 +549,7 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
     gradient_names = OrderedDict()
     gradient_names['CCSD(T)'] = [""]
     gradient_names['RKS'] = ['RKS GRADIENT']
+    gradient_names['UKS'] = ['UKS GRADIENT']
     gradient_names['MP2'] = ['MP2 GRADIENT']
 
     all_methods = OrderedDict()
@@ -557,6 +561,7 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
     all_methods['DF-MP2'] = ["MP2"]
     all_methods['DF-RMP2'] = ["DF-RMP2"]
     all_methods['RKS'] = ["RKS"]
+    all_methods['UKS'] = ["UKS"]
     all_methods['CCSD(T)-F12'] = ["CCSD(T)-F12a", "CCSD(T)-F12b"]
     all_methods['CCSD(T)'] = ["CCSD(T)"]
 
@@ -668,4 +673,3 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
                 cluster.arrays[my_force] = np.array(force_matrix)
 
     return cluster
-
