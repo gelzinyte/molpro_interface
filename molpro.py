@@ -76,7 +76,9 @@ class Molpro(Calculator):
         if properties is None:
             properties = self.get_default_properties()
         else:
-            properties = list(set(self.get_default_properties() + properties))
+            #properties = list(set(self.get_default_properties() + properties))
+            properties = list(set(['energy'] + properties))
+
 
         for prop in properties:
             if prop not in self.implemented_properties:
@@ -174,6 +176,9 @@ class Molpro(Calculator):
         # Read template into MolproDatafile object
         datafile = MolproDatafile(datafile=MOLPRO_TEMPLATE)
 
+        if 'forces' in properties and 'FORCE' not in datafile.keys():
+            lines_to_append +=['FORCE']
+
         # Update the reference to the geometry file, or create one if it's not there
         if 'GEOMETRY' not in datafile.keys() and 'GEOM' not in datafile.keys():
             temp = MolproDatafile()
@@ -200,6 +205,8 @@ class Molpro(Calculator):
         extract_forces = False
         if 'FORCE' in datafile.keys():
             extract_forces = True
+        if extract_forces == True and 'forces' not in properties: 
+            properties += ['forces']
 
         if not run_molpro(datafile, MOLPRO, label, test_mode=TEST_MODE):
             log.error('molpro run failed')
