@@ -68,7 +68,7 @@ class Molpro(Calculator):
             raise TypeError('Please pass calc_args as dictionary, for now')
         self.calc_args = deepcopy(calc_args)
 
-    def calculate(self, atoms=None, properties=None, system_changes=None):
+    def calculate(self, atoms=None, properties=None, system_changes=None, copy_all_results=True):
         # TODO what's up with system_changes, etc
 
         # TODO do I actually need this
@@ -88,6 +88,8 @@ class Molpro(Calculator):
 
         calc_args = deepcopy(self.calc_args)
         label = self._label
+
+        # do something if atoms is None
 
         # over from molpro_driver.py
         # -----------------------------------------------------------------------------------------
@@ -220,6 +222,12 @@ class Molpro(Calculator):
         self.results['energy'] = self.atoms.info['energy']
         if 'forces' in properties:
             self.results['forces'] = np.copy(self.atoms.arrays['forces'])
+
+        if isinstance(copy_all_results, bool) and copy_all_results:
+            print('copying results')
+            self.atoms.info['energy'] = self.results['energy']
+            if 'forces' in self.results.keys():
+                at.arrays['forces'] = self.results['forces'].copy()
 
     def get_default_properties(self):
         return self._default_properties[:]
