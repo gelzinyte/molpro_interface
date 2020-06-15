@@ -224,10 +224,11 @@ class Molpro(Calculator):
             self.results['forces'] = np.copy(self.atoms.arrays['forces'])
 
         if isinstance(copy_all_results, bool) and copy_all_results:
-            print('copying results')
+            #print('copying results')
             self.atoms.info['energy'] = self.results['energy']
             if 'forces' in self.results.keys():
-                at.arrays['forces'] = self.results['forces'].copy()
+                self.atoms.info['forces'] = self.results['forces'] 
+                #at.arrays['forces'] = self.results['forces'].copy()
 
     def get_default_properties(self):
         return self._default_properties[:]
