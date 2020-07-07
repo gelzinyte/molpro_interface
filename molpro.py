@@ -330,7 +330,7 @@ class MolproDatafile(OrderedDict):
             else:
                 self[key][0] += (';' + line)
         else:
-            nonalpha = re.compile('[^a-zA-Z0-9()\-]')  # '\-' works fine
+            nonalpha = re.compile('[^a-zA-Z0-9()\-\}\{]')  # '\-' works fine
             separator = re.findall(nonalpha, line)
 
             if len(separator) > 0:
@@ -386,6 +386,7 @@ class MolproDatafile(OrderedDict):
             if line.startswith('#') or line.startswith('!') or line.startswith('*') or line == '':
                 continue
 
+            '''
             # Check if any brackets in line
             open_bracket = re.search('{', line)
             close_bracket = re.search('}', line)
@@ -424,8 +425,10 @@ class MolproDatafile(OrderedDict):
                         current_key = None
                         continue
             # normal line - no brackets
-            else:
-                self.parse_line(line, current_key)
+            '''
+            # else:
+            #     self.parse_line(line, current_key)
+            self.parse_line(line, current_key)
 
     def read_from_molpro_output(self, molpro_output):
         """Read the input file from molpro output. Input should be filename, file-like object or list of lines"""
