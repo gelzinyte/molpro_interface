@@ -1,18 +1,22 @@
 """The module defines an interface to MOLPRO 2012 (?).
     Based on Python 2 molpro driver for quippy by Alan Nichol, James Kermode
     and others (????). Adapted to ASE by Elena Gelžinytė.
-    Loosely based on castep ase calculator.
+    Loosely based on castep ase calculator and Tamas' Orca (based on NWChem?).
 """
 
 # TODO list:
 #   Raise appropriate calculator errors
 #   Clean up imports to follow python conventions
+#   can I leave scratch directory to its own devices if not specified?
 
 import os
 import pdb
 import ase
+from lxml import etree as et
 from ase.calculators.calculator import FileIOCalculator, Parameters, \
-                                       CalculatorSetupError, Calculator
+                                       CalculatorSetupError, Calculator, \
+                                       ReadError, PropertyNotImplementedError,\
+                                    SCFError, PropertyNotPresent
 
 __all__ = ['Molpro']
 
@@ -60,6 +64,17 @@ Keyword                    Description
 ``check_molpro_version``   Should implement???
 
 ``keyword_tolerance``      Should implement?
+
+=========================  ===================================================
+
+
+Arguments:
+==========
+
+=========================  ===================================================
+Keyword                    Description
+=========================  ===================================================
+
 
 =========================  ===================================================
 
@@ -145,10 +160,11 @@ End Molpro Interface Documentation
     # default_parameters = dict(
     #     memory='500, m',
     #     basis='6-31G',
-    #     program='hf')
+    #     program='hf',
+    #     task='forces')
 
-    def __init__(self, restart=None, ignore_bad_restart_file=False, label='molpro',
-               atoms=None, molpro_command=None, directory='MOLPRO', **kwargs):
+    def __init__(self, restart=None, ignore_bad_restart_file=False, label='MOLPRO/molpro',
+               atoms=None, molpro_command=None, **kwargs):
 
         self.__name__='Molpro'
 
@@ -165,10 +181,35 @@ End Molpro Interface Documentation
 
         Calculator.__init__(self, restart=restart,
                 ignore_bad_restart_file=ignore_bad_restart_file, label=label,
-                atoms=atoms, directory=directory, **kwargs)
+                atoms=atoms,  **kwargs)
 
-        self.molpro_command = self.get_molpro_command(molpro_command)
 
+
+        # Maybe I need this, maybe I don't
+        # Calculator state variables
+        self._calls = 0
+        self._warnings = []
+        self._error = None
+        self._interface_warnings = []
+
+        # Internal Keys to allow to tweak behaviour
+        self.molpro_command = get_molpro_command(molpro_command)
+        # self._force_write = True
+        self._prepare_input_only = False
+        self._rename.existing_dir = True
+        self._set_atoms = False
+        self._default_forces = False   #call energies and forces when calling calculator
+        # default. Gets overwritten if set in parameters (TODO! Also does
+        #  maxit only apply to scf or other optimisations?) or
+        self._scf_maxit = 60
+
+
+        # Physical result variables
+        # check if I need this.
+        self._point_group = None
+
+        # TODO cycle through parameters and set appropriate ones here.
+        # TODO capitalise appropriate parameters (?) 
 
 
 
@@ -177,38 +218,153 @@ End Molpro Interface Documentation
     def calculate(self, atoms=None, properties=['energy'], systm_changes=\
                   ['positions', 'numbers', 'cell', 'pbc', 'initial_charges',
                    'initial_magmoms']):
+        # TODO check what to do with properties and system_changes
+        self.write_input(self, atoms, properties, system_changes)
+        if not self._prepare_input_only:
+            self.run()
+            self.read()
+            self.push_old_state()
+
+
+    def run(self):
+        self._calls += 1
+
+        # add scratch directory
+        # deal with setting workind directory and giving labels, rather than anything else
+        stdout, stderr = shell_stdouterr(f'{self.molpro_command} {self.input_fname} -o {self.output_fname}')
+
+        if stdout:
+            print(f'molpro call stdout:\n{stdout}')
+
+        if stderr:
+            print(f'molpro call stderr:\n{stderr}')
+
+    def push_old_state(self):
         pass
 
+
+    # TODO difference between read and read_results?
     def read(self):
+        # maybe introduce function to read open file or just generic file as with castep.
+        # deal with reading from .out not only .xml, also from a fileobject
+        if not os.path.isfile(self.label + '.xml'):
+            # would this be ok speed and memory-wise?
+            # xml = parse_xml()
+            raise ReadError('xml output file does not exist')
+        elif os.path.isfile(self.label + '.out'):
+            raise RuntimeError('.xml is not present and reading from .out files not implemented yet')
+        # else:
+
+
+        self.parameters = Parameters.read(self.label + '.ase')
+        # decide what to do with _set_atoms and
+        # Check if 'overriding previous calculator-attached results' works like this
+        if not self._set_atoms:
+            self.atoms = ase.io.read(self.label + '.xyz')
+        else:
+            # Means used non-single point energy calculation and need to update atom positions.
+            raise NotImplementedError('reading atoms from .xml or .out not yet implemented')
+
+        self.read_results()
+
+    # def parse_xml(self):
+    #     check convergence
+    #     if calc_type not given, get the last one set in the input file
+    #       I guess either in the .inp or from the xml.
+    def check_warnings_errors(self):
+        root = et.parse(slef.label + '.xml').getroot()
+
+    def check_SCF_convergence(self):
+        # and read other stuff too
+        program = self.parameters.program
+        root = et.parse(slef.label + '.xml').getroot()
+        job = root.find('{http://www.molpro.net/schema/molpro-output}job')
+        jobsteps = job.findall(
+            '{http://www.molpro.net/schema/molpro-output}jobstep')
+        for jobstep in jobsteps:
+            if program in jobstep.attrib['command']:
+                for child in jobstep:
+                    text = child.text
+                    if text is not None and 'ITERATION' in text:
+                        text_lines = text.splitlines()
+                        #                 print(text)
+                        for idx, line in enumerate(text_lines):
+                            if 'MAX. NUMBER OF ITERATIONS' in line:
+                                maxit = int(re.search(r'\d+', line).group())
+                                print('maxit:', maxit)
+                            if 'Final occupancy' in line:
+                                last_scf_line = text_lines[idx - 2].strip()
+                                # ^ and search are probably doubling up
+                                match = re.search(r'^\d+',
+                                                  last_scf_line).group()
+                                last_iteration = int(match)
+                                print(last_iteration)
+                                if last_iteration == 11:
+                                    print('yay')
+
+                            # TODO Spot messages for not converging and
+                            #  stopping after a few iterations
+
+    def read_other_stuff(self):
         pass
 
     def read_results(self):
-        pass
+        # TODO do this somehow better? Definitely for multiple cases
+        # check how to check for 'program' TODO
+        if 'program' not in self.parameters.keys():
+        #     TODO read it out from the input somehow
+            raise ReadError('\'program\' not in calculator\'s parameters, not sure which energy to extract')
+        #
+
+        # TODO check for errors and warnings
+        self.check_warnings_errors()
+
+        # Check for SCF
+        # TODO or pass something, not root?
+        self.check_SCF_convergence()
+
+
+
+        self.read_energy()
+        # TODO think about how to deal with forces
+        # TODO use 'self.parameters.task.fin('gradient') > -1 maybe?
+        if self.parameters.task.find('forces') > -1:
+            self.read_forces()
+
+        self.read_other_stuff()
+
+
+
+    @property
+    def name(self):
+        return self.__name__
+
+    @property
+    def input_fname(self):
+        return self.label + '.inp'
+
+    @property
+    def output_fname(self):
+        return self._label + '.out'
 
     def write_input(self, atoms, properties=None, system_changes=None):
+        # make so that either read from .xml, .out, .inp or something else.
         # creates a directory
         FileIOCalculator.write_input(self, atoms, properties, system_changes)
         p = self.parameters
         if 'program' not in p.keys():
             raise CalculatorSetupError('must give a name of the program')
         p.write(self.label + '.ase')
-        # write xyz file to be included by molpro.
-        # TODO workout how to preserve all at.info entries
-        # alternative is to write .xyz directly to template, but I think this
-        # is more convenient to inspect (e.g. with .xyz viewer). Maybe add
-        # an option?
         ase.io.write(self.label+'.xyz', atoms) # TODO check why not self.atoms
-        with open(self.label+'.inp', 'w') as f:
+        with open(self.input_fname, 'w') as f:
             if 'memory' in p.keys():
                 # assume p.memory is given as a string 'amount, units'
-                f.write(f'memory, {p.memory}')
+                f.write(f'memory, {p.memory}\n')
             f.write('geomtyp=xyz\n')
-            f.write(f'geom={self.label}.xyz')
+            f.write(f'geom={self.label}.xyz\n')
             if 'basis' in p.keys():
-                f.write(f'basis={p.basis}')
-            f.write(p.program) # TODO add check and raise error if command is not given
-
-
+                f.write(f'basis={p.basis}\n')
+            f.write(f'{p.program}\n')
 
         pass
 
@@ -224,11 +380,37 @@ End Molpro Interface Documentation
     # def set_label(self):
     #     pass
 
-    def get_molpro_command(molpro_command=''):
-        # TODO documment this somewhere
-        if molpro_command:
-            return molpro_command
-        elif 'MOLPRO_COMMAND' in os.environ:
-            return os.environ['MOLPRO_COMMAND']
-        else:
-            return 'molpro'
+
+    def read_parameters_from_input_file(self):
+        pass
+
+
+def get_molpro_command(self, molpro_command=''):
+    # TODO documment this somewhere
+    if molpro_command:
+        return molpro_command
+    elif 'MOLPRO_COMMAND' in os.environ:
+        return os.environ['MOLPRO_COMMAND']
+    else:
+        return 'molpro'
+
+def shell_stdouterr(raw_command, cwd=None):
+    """Abstracts the standard call of the commandline, when
+    we are only interested in the stdout and stderr
+    """
+    stdout, stderr = subprocess.Popen(raw_command,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE,
+                                      universal_newlines=True,
+                                      shell=True, cwd=cwd).communicate()
+    return stdout.strip(), stderr.strip()
+
+
+
+'''
+from molpro2 import Molpro
+from ase.build import molecule
+at = molecule('CH4')
+mp = Molpro(program='hf')
+'''
+
