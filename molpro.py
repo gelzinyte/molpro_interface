@@ -590,7 +590,9 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
 
     # loop through datafile to look for methods.
     calcs = []  # holds the keys for getting correct method, energy_name, gradient_name
-    data_keys_upper = [key.upper() for key in datafile.keys()]
+    dfile_keys_stripped = [key.replace('{', '') for key in datafile.keys()]
+    data_keys_upper = [key.upper() for key in dfile_keys_stripped]
+    # data_keys_upper = [key.upper() for key in datafile.keys()]
     for key in all_methods.keys():
         if key in data_keys_upper:
             calcs.append(key)
@@ -614,7 +616,8 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
     if cluster is None:
         # cluster = Atoms(n=len(elements))
         # cluster.set_atoms(elements)
-        position_matrix = np.array(position_matrix).T
+        # position_matrix = np.array(position_matrix).T
+        position_matrix = np.array(position_matrix)
         if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in datafile.keys():
             position_matrix = position_matrix * (1.0 / 0.529177249)
         # cluster.pos[:,:]=position_matrix
