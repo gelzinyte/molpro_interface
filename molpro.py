@@ -618,8 +618,8 @@ def read_xml_output(xmlfile, energy_from=None, extract_forces=False, extract_dip
         # cluster.set_atoms(elements)
         # position_matrix = np.array(position_matrix).T
         position_matrix = np.array(position_matrix)
-        if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in datafile.keys():
-            position_matrix = position_matrix * (1.0 / 0.529177249)
+        # if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in datafile.keys():
+        #     position_matrix = position_matrix * (1.0 / 0.529177249)
         # cluster.pos[:,:]=position_matrix
         # #note this leaves the lattice undefined
 
