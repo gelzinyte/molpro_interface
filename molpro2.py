@@ -13,13 +13,14 @@ import os
 import pdb
 import ase
 from lxml import etree as et
-from ase.calculators.calculator import FileIOCalculator, Parameters, \
+from ase.calculators.calculator import FileIOCalculator, \
                                        CalculatorSetupError, Calculator, \
                                        ReadError, PropertyNotImplementedError,\
-                                    SCFError, PropertyNotPresent
+                                       SCFError, PropertyNotPresent
+
+from ase.calculators.calculator import Parameters
 
 __all__ = ['Molpro']
-
 
 
 class Molpro(FileIOCalculator):
@@ -138,35 +139,32 @@ blah blah
 End Molpro Interface Documentation
 """
 
-    # Class attributes
-    # TODO implement/check how this is used/called, now only what I think is ok
-    atoms_keys = ['charges']
-
-    atoms_obj_keys = [
-        'dipole',
-        'energy_free',
-        'forces',
-        'positions']
-
-    internal_keys = [
-        '_molpro_command',
-        '_prepare_input_only',
-        '_rename_existing_dir',
-        '_set_atoms'
-    ]
-    # TODO check this!!!
     implemented_properties = ['energy', 'forces']
-    # TODO maybe implement default_parameters?
-    # default_parameters = dict(
-    #     memory='500, m',
-    #     basis='6-31G',
-    #     program='hf',
-    #     task='forces')
+
+    default_parameters = dict(task='gradient',
+                              basis='6-31G*',
+                              functional='b3lyp')
+
 
     def __init__(self, restart=None, ignore_bad_restart_file=False, label='MOLPRO/molpro',
                atoms=None, molpro_command=None, **kwargs):
 
-        self.__name__='Molpro'
+        # TODO add an option to read out a template file to read out all the parameters
+        # TODO function to make a template file out of everything
+        # TODO should I input and link .xyz file or coordinates directly?
+        # TODO deal with the directories - scratch (what's the default?), working
+        # dir to write in and out all the tmp files, an option to not delete that
+        # and how to deal with duplicate files that molpro just moves over
+        # Does creating and removing directories with every calculation slow it down?
+        # Maybe add a cleanup function that once everything is done removes all the tmp dirs
+        # TODO add a function to use the calculator parallely.
+        # TODO have a problem if .xyz file that is passed in has a number of at.info stuff.
+        # Set it up so that the molpro input has no info, but when it's read out, at.info from original at file is returned.
+        # actually probably taken care of by ase itself.
+        # TODO when to make functions part of Molpro class and when just include them in this .py file?
+
+        self.__name__ = 'Molpro'
+        self.molpro_command = get_molpro_command(molpro_command)
 
         # initialise the FileIOCalculator. This does:
         #   Initialises ase.calculators.calculator.Calculator
@@ -179,38 +177,57 @@ End Molpro Interface Documentation
         #    and sets name.
         # pdb.set_trace()
 
-        Calculator.__init__(self, restart=restart,
+        # TODO sort out how command=molpro_command works out in FileIOCalculator
+        FileIOCalculator.__init__(self, restart=restart,
                 ignore_bad_restart_file=ignore_bad_restart_file, label=label,
-                atoms=atoms,  **kwargs)
+                atoms=atoms, command=molpro_command, **kwargs)
 
 
-
-        # Maybe I need this, maybe I don't
-        # Calculator state variables
-        self._calls = 0
-        self._warnings = []
-        self._error = None
-        self._interface_warnings = []
-
-        # Internal Keys to allow to tweak behaviour
-        self.molpro_command = get_molpro_command(molpro_command)
-        # self._force_write = True
+        self._no_scf_iterations = None
         self._prepare_input_only = False
         self._rename.existing_dir = True
-        self._set_atoms = False
-        self._default_forces = False   #call energies and forces when calling calculator
-        # default. Gets overwritten if set in parameters (TODO! Also does
-        #  maxit only apply to scf or other optimisations?) or
         self._scf_maxit = 60
+        self._geomtyp = 'xyz'
 
 
-        # Physical result variables
-        # check if I need this.
-        self._point_group = None
+        #######################
+        # scrape this and put tests somewhere else
+        ###########################
 
-        # TODO cycle through parameters and set appropriate ones here.
-        # TODO capitalise appropriate parameters (?) 
+        # TODO get default parameters here maybe and then overwrite?
+        # TODO document these in the docummenttion
+        # TODO how to enforce compulsory arguments? Or have defaults? 
+        # set keyword arguments
+        for keyword, item in kwargs.items():
+            # TODO maybe make everything be uppercase so capitalisation miscommunication is avoided??
+            # set and check for specific allowed arguments related to molpro
+            if keyword == 'task':
+                supported_tasks = ['gradient', 'energy_only', 'optg']
+                if item not in supported_tasks:
+                    raise CalculatorSetupError(
+                        f'{item} unrecognised, {keyword} must be one of {supported_tasks}')
+                self.task = item
+                
+            elif keyword == 'basis':
+                # if keyword not in []  # TODO scrape a list out of the basis set library?
+                self.basis = item
+                
+            elif keyword == 'command':
+                supported_commands = ['RKS', 'UKS', 'HF'] # TODO extend/scrape/transfer from previous calculator
+                if item not in supported_commands:
+                    raise CalculatorSetupError(f'{item} unrecognised, {keyword} must be one of {supported_commands}')
+                self.command = item
+                
+            elif keyword == 'functional':
+                supported_functionals = ['b-lyp', 'pbe', 'b3lyp']
+                if item not in supported_functionals: # TODO extend/scrape/transfer
+                    raise CalculatorSetupError(f'{item} unrecognised, {keyword} must be one of {supported_functionals}')
 
+            elif keyword == 'extended_command':
+                if self.command not in item:
+                    # TODO how to know what is the appropriate error to raise?
+                    raise Exception(f"Keyword 'command'={self.command} is not found in the {keyword}")
+                self.extended_commnad = item
 
 
 
@@ -219,11 +236,58 @@ End Molpro Interface Documentation
                   ['positions', 'numbers', 'cell', 'pbc', 'initial_charges',
                    'initial_magmoms']):
         # TODO check what to do with properties and system_changes
+        Calculator.calculate(self, atoms, properties, system_changes)
         self.write_input(self, atoms, properties, system_changes)
         if not self._prepare_input_only:
             self.run()
             self.read()
             self.push_old_state()
+
+    def write_input(self, atoms, properties=None, system_changes=None):
+        # make so that either read from .xml, .out, .inp or something else.
+        # creates a directory
+        FileIOCalculator.write_input(self, atoms, properties, system_changes)
+        p = self.parameters
+        if 'program' not in p.keys():
+            raise CalculatorSetupError('must give a name of the program')
+        p.write(self.label + '.ase')
+        ase.io.write(self.label+'.xyz', atoms) # TODO check why not self.atoms
+        with open(self.input_fname, 'w') as f:
+            if 'memory' in p.keys():
+                # assume p.memory is given as a string 'amount, units'
+                f.write(f'memory, {p.memory}\n')
+            f.write('geomtyp=xyz\n')
+            f.write(f'geom={self.label}.xyz\n')
+            if 'basis' in p.keys():
+                f.write(f'basis={p.basis}\n')
+            f.write(f'{p.program}\n')
+
+        pass
+
+    def read_results(self):
+        # TODO do this somehow better? Definitely for multiple cases
+        # check how to check for 'program' TODO
+        if 'program' not in self.parameters.keys():
+        #     TODO read it out from the input somehow
+            raise ReadError('\'program\' not in calculator\'s parameters, not sure which energy to extract')
+        #
+
+        # TODO check for errors and warnings
+        self.check_warnings_errors()
+
+        # Check for SCF
+        # TODO or pass something, not root?
+        self.check_SCF_convergence()
+
+
+
+        self.read_energy()
+        # TODO think about how to deal with forces
+        # TODO use 'self.parameters.task.fin('gradient') > -1 maybe?
+        if self.parameters.task.find('forces') > -1:
+            self.read_forces()
+
+        self.read_other_stuff()
 
 
     def run(self):
@@ -273,6 +337,7 @@ End Molpro Interface Documentation
     #       I guess either in the .inp or from the xml.
     def check_warnings_errors(self):
         root = et.parse(slef.label + '.xml').getroot()
+        pass
 
     def check_SCF_convergence(self):
         # and read other stuff too
@@ -282,56 +347,35 @@ End Molpro Interface Documentation
         jobsteps = job.findall(
             '{http://www.molpro.net/schema/molpro-output}jobstep')
         for jobstep in jobsteps:
-            if program in jobstep.attrib['command']:
+            if program.upper() in jobstep.attrib['command']:
                 for child in jobstep:
                     text = child.text
                     if text is not None and 'ITERATION' in text:
                         text_lines = text.splitlines()
-                        #                 print(text)
                         for idx, line in enumerate(text_lines):
                             if 'MAX. NUMBER OF ITERATIONS' in line:
                                 maxit = int(re.search(r'\d+', line).group())
-                                print('maxit:', maxit)
+                                self._scf_maxit = maxit
                             if 'Final occupancy' in line:
                                 last_scf_line = text_lines[idx - 2].strip()
                                 # ^ and search are probably doubling up
                                 match = re.search(r'^\d+',
                                                   last_scf_line).group()
                                 last_iteration = int(match)
-                                print(last_iteration)
-                                if last_iteration == 11:
-                                    print('yay')
+                                if last_iteration == self._scf_maxit:
+                                    raise SCFError('Maxed out of SCF iterations')
+                                elif last_iteration > self._scf_maxit:
+                                    raise RuntimeError('last_iteration > self._scf_maxit, something is worng with the code')
 
                             # TODO Spot messages for not converging and
                             #  stopping after a few iterations
+                        # only interested in this (TODO: unless more than one program), so can return (?).
+                        return
 
     def read_other_stuff(self):
         pass
 
-    def read_results(self):
-        # TODO do this somehow better? Definitely for multiple cases
-        # check how to check for 'program' TODO
-        if 'program' not in self.parameters.keys():
-        #     TODO read it out from the input somehow
-            raise ReadError('\'program\' not in calculator\'s parameters, not sure which energy to extract')
-        #
 
-        # TODO check for errors and warnings
-        self.check_warnings_errors()
-
-        # Check for SCF
-        # TODO or pass something, not root?
-        self.check_SCF_convergence()
-
-
-
-        self.read_energy()
-        # TODO think about how to deal with forces
-        # TODO use 'self.parameters.task.fin('gradient') > -1 maybe?
-        if self.parameters.task.find('forces') > -1:
-            self.read_forces()
-
-        self.read_other_stuff()
 
 
 
@@ -347,26 +391,7 @@ End Molpro Interface Documentation
     def output_fname(self):
         return self._label + '.out'
 
-    def write_input(self, atoms, properties=None, system_changes=None):
-        # make so that either read from .xml, .out, .inp or something else.
-        # creates a directory
-        FileIOCalculator.write_input(self, atoms, properties, system_changes)
-        p = self.parameters
-        if 'program' not in p.keys():
-            raise CalculatorSetupError('must give a name of the program')
-        p.write(self.label + '.ase')
-        ase.io.write(self.label+'.xyz', atoms) # TODO check why not self.atoms
-        with open(self.input_fname, 'w') as f:
-            if 'memory' in p.keys():
-                # assume p.memory is given as a string 'amount, units'
-                f.write(f'memory, {p.memory}\n')
-            f.write('geomtyp=xyz\n')
-            f.write(f'geom={self.label}.xyz\n')
-            if 'basis' in p.keys():
-                f.write(f'basis={p.basis}\n')
-            f.write(f'{p.program}\n')
 
-        pass
 
     # Optional:
     def set(self, **kwargs):
