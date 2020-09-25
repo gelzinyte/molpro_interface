@@ -288,6 +288,7 @@ End Molpro Interface Documentation
         # read parameters
         self.parameters = Parameters.read(self.label + '.ase')
 
+
         # read atoms from .xml file
         energy_from = self.parameters.command
         if self.parameters.task == 'gradient':
@@ -297,13 +298,15 @@ End Molpro Interface Documentation
         else:
             extract_forces = None
 
-        atoms = read_xml_output(self.label+'.xml', energy_from=energy_from, extract_forces=extract_forces)
-        self.atoms = atoms
+        self.atoms = read_xml_output(self.label+'.xml', energy_from=energy_from, extract_forces=extract_forces)
 
         # read calculated properties
-        self.results['energy'] = atoms.info['energy']
-        if 'gradient' in self.parameters.keys():
-            self.results['forces'] = atoms.arrays['forces']
+        self.results['energy'] = self.atoms.info['energy']
+        if self.parameters.task == 'gradient':
+            self.results['forces'] = self.atoms.arrays['forces']
+
+
+
 
 
     @property
@@ -567,9 +570,6 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
     # create atoms object
     if atoms is None:
         position_matrix = np.array(position_matrix)
-        if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in \
-                                                     datafile.keys():
-            position_matrix = position_matrix * (1.0 / 0.529177249)
         atoms = Atoms(elements, positions=position_matrix)
 
     # extract from xml energy values for each of the methods found in datafile
