@@ -1,10 +1,3 @@
-"""The module defines an interface to MOLPRO 2012 (?).
-    Based on Python 2 molpro driver for quippy by Alan Nichol, James Kermode
-    and others (????). Adapted to ASE by Elena Gelžinytė.
-    Loosely based on castep ase calculator and Tamas' Orca (based on NWChem?).
-"""
-
-
 import os
 import sys
 import re
@@ -22,11 +15,10 @@ import ase
 from ase.units import Hartree, Bohr
 from ase import Atoms
 
-from ase.calculators.calculator import FileIOCalculator, \
-                                       CalculatorSetupError, Calculator, \
-                                       ReadError, PropertyNotImplementedError,\
-                                       SCFError, PropertyNotPresent
-
+from ase.calculators.calculator import FileIOCalculator
+from ase.calculators.calculator import Calculator
+from ase.calculators.calculator import ReadError
+from ase.calculators.calculator import SCFError
 from ase.calculators.calculator import Parameters
 from ase.calculators.calculator import all_changes
 
@@ -34,6 +26,7 @@ from ase.calculators.calculator import all_changes
 # TODO figure out when at.info or at.arrays entries are too long for Molpro
 #      and deal with it
 # TODO add option for geometry optimisation with Molpro
+#
 
 
 __all__ = ['Molpro']
@@ -43,6 +36,10 @@ __all__ = ['Molpro']
 class Molpro(FileIOCalculator):
     r"""
 Molpro Interface Documentation
+
+The module defines an interface to MOLPRO 2012 (?).
+Based on Python 2 molpro driver for quippy by Alan Nichol, James Kermode
+and others (who?). Adapted to ASE by Elena Gelžinytė.
 
 =========================   ==================================================
 Calculator arguments        Description
@@ -85,7 +82,7 @@ Molpro arguments            Description
 ``memory``                  Memory in 'amount, unit' e.g. '300, w'
 
 ``command_block``           Molpro command block in the form of
-                            '{COMMAND, options \n directives \n data \n}'
+                            '{COMMAND, options \\n directives \\n data \\n}'
 
 ``maxit``                   Maximum number of SCF iterations. Molpro default
                             is 60.
@@ -118,6 +115,11 @@ Internal Setting            Description
 ``discard_results_on_any_change``
                             (''=True'') Resets the calculator if any of te
                             parameters have changed.
+
+``_rename_existing_dir``   (``=True``) (TODO not implemented) when using a new instance
+                           of the calculator, this will move directories out of
+                           the way that would be overwritten otherwise,
+                           appending a date string.
 
 =========================   ==================================================
 
