@@ -4,15 +4,24 @@
     Loosely based on castep ase calculator and Tamas' Orca (based on NWChem?).
 """
 
-# TODO list:
-#   Raise appropriate calculator errors
-#   Clean up imports to follow python conventions
-#   can I leave scratch directory to its own devices if not specified?
 
 import os
-import pdb
-import ase
+import sys
+import re
+import subprocess
+import shutil
+
+import numpy as np
 from lxml import etree as et
+from pathlib import Path
+from collections import OrderedDict
+from collections import abc
+import xml.dom.minidom as minidom
+
+import ase
+from ase.units import Hartree, Bohr
+from ase import Atoms
+
 from ase.calculators.calculator import FileIOCalculator, \
                                        CalculatorSetupError, Calculator, \
                                        ReadError, PropertyNotImplementedError,\
@@ -20,7 +29,11 @@ from ase.calculators.calculator import FileIOCalculator, \
 
 from ase.calculators.calculator import Parameters
 from ase.calculators.calculator import all_changes
-from pathlib import Path
+
+# TODO add a function to use the calculator parallelly?
+# TODO figure out when at.info or at.arrays entries are too long for Molpro
+#      and deal with it
+# TODO add option for geometry optimisation with Molpro
 
 
 __all__ = ['Molpro']
@@ -31,119 +44,88 @@ class Molpro(FileIOCalculator):
     r"""
 Molpro Interface Documentation
 
-
-Introduction
-============
-
-Something something
-
-
-Getting Started
-===============
-
-something something 
-something something
+=========================   ==================================================
+Calculator arguments        Description
+=========================   ==================================================
+``directory``               Relative path where all Molpro-related outputs will
+                            be placed. Will be created if doesn't exist.
 
 
-Running the Calculator
-======================
+``label``                   The prefix for .inp, .xyz, .out, .xml, etc files.
+
+``molpro_command``          Command to run molpro. Can also be set via the bash
+                            environment variable ``MOLPRO_COMMAND`. If none is
+                            given or found, will default to ``molpro``.
+
+``scratch_dir``             Scratch directory for Molpro.
+
+``restart``                 TODO
+
+``ignore_bad_restart_file`` TODO
 
 
-Arguments:
-==========
+=========================   ==================================================
 
-=========================  ===================================================
-Keyword                    Description
-=========================  ===================================================
-``directory``              Relative path where all Molpro-related items will
-                           be placed. Will be created if doesn't exist.
-                           TODO: add behaviour with how to deal with existing
-                           directory.
+=========================   ==================================================
+Molpro arguments            Description
+=========================   ==================================================
 
-``label``                  The prefix for .inp, .xyz, .out, .xml, etc files.
+``task``                    Either ``energy_only`` or ``gradient`` for calcu-
+                            lating energies only or graidnets as well with
+                            a Molpro call. Mandatory.
 
-``molpro_command``         Command to run molpro. Can also be set via the bash
-                           environment variable ``MOLPRO_COMMAND`. If none is
-                           given or found, will default to ``molpro``.
+``command``                 Electronic structure method to execute. Also used
+                            to extract the appropriate value from the output
+                            file. Mandatory.
 
-``check_molpro_version``   Should implement???
+``basis``                   Basis for the method. Mandatory.
 
-``keyword_tolerance``      Should implement?
+``functional``              Functional, if appropriate.
 
-=========================  ===================================================
+``memory``                  Memory in 'amount, unit' e.g. '300, w'
 
+``command_block``           Molpro command block in the form of
+                            '{COMMAND, options \n directives \n data \n}'
 
-Arguments:
-==========
+``maxit``                   Maximum number of SCF iterations. Molpro default
+                            is 60.
 
-=========================  ===================================================
-Keyword                    Description
-=========================  ===================================================
-
-
-=========================  ===================================================
-
-
-Additional Settings
-===================
-
-=========================  ===================================================
-Internal Setting           Description
-=========================  ===================================================
-``_molpro_command``        (``=molpro``): the actual shell command used to
-                           call MOLPRO
-
-``_prepare_input_only``     (``=False``): If set to True, the calculator will
-                           create \*.inp and \*.xyz files but not start the
-                           calculation itself.
-
-``_rename_existing_dir``   (``=True``) : when using a new instance
-                           of the calculator, this will move directories out of
-                           the way that would be overwritten otherwise,
-                           appending a date string.
-
-``_set_atoms``             (``=False``) : setting this to True will overwrite
-                           any atoms object previously attached to the
-                           calculator when reading the output file.  By de-
-                           fault, the read() function will only create a new
-                           atoms object if none has been attached and other-
-                           wise try to assign forces etc. based on the atom's
-                           positions.  ``_set_atoms=True`` could be necessary
-                           if one uses internal geometry optimization
-                           (``blah``)
-                           because then the positions get out of sync.
-                           *Warning*: this option is generally not recommended
-                           unless one knows one really needs it. There should
-                           never be any need, if MOLPRO is used as a
-                           single-point calculator.
-
-=========================  ===================================================
-
-Special features
-================
+``template_path``           A path to template to be used instead of suplying
+                            keyword arguments. Must have a ``geomtyp=xyz``
+                            and an unasigned ``geom=`` which is linked to the
+                            relevant file by the calculator. ``command`` must
+                            also be specified to indicate which energy to pick
+                            from the Molpro output file.
 
 
-``.keyword.clear()``
-  ??maybe implement?
-
-``.initialize()``
-  Creates all needed input in the ``_directory``. This could then be copied to
-  and ran in a place without ASE or Python.
-
-``print(calc)``
-  Prints a short summary of the calculator settings and atoms.
+=========================   ==================================================
 
 
-Notes/Issues
-============
+=========================   ==================================================
+Internal Setting            Description
+=========================   ==================================================
 
-blah blah
+``_prepare_input_only``     (``=False``) If set to ``True``, calculator will
+                            stop before calling Molpro.
+
+``_run_molpro``             (``=True``) Whether to call Molpro. Will try to
+                            read output even if Molpro is not called.
+
+``_overwrite_old_outputs``  (``=True``) Removes old output files if found
+                            before calling Molpro. Otherwise old outputs
+                            are appended with a number.
+
+``discard_results_on_any_change``
+                            (''=True'') Resets the calculator if any of te
+                            parameters have changed.
+
+=========================   ==================================================
 
 
 End Molpro Interface Documentation
 """
 
-    # keyword arguments to update: 'memory', check write_input
+
 
     implemented_properties = ['energy', 'forces']
 
@@ -152,74 +134,77 @@ End Molpro Interface Documentation
                               basis='6-31G*',
                               functional='b3lyp')
 
-    discard_results_on_any_change = True # resets calculator if any of the parameters have changed
+    discard_results_on_any_change = True
 
-    # from what was in read_xml_output. Where should assert that the command is in it?
     supported_commands = ['CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2',
             'DF-RMP2', 'RKS', 'UKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF']
 
+    supported_tasks = ['energy_only', 'gradient']
 
 
-    def __init__(self, restart=None, ignore_bad_restart_file=False, label='MOLPRO/molpro',
-               atoms=None, molpro_command=None, **kwargs):
 
-        # TODO add an option to read out a template file to read out all the parameters
-        # TODO function to make a template file out of everything
-        # TODO should I input and link .xyz file or coordinates directly?
-        # TODO deal with the directories - scratch (what's the default?), working
-        # dir to write in and out all the tmp files, an option to not delete that
-        # and how to deal with duplicate files that molpro just moves over
-        # Does creating and removing directories with every calculation slow it down?
-        # Maybe add a cleanup function that once everything is done removes all the tmp dirs
-        # TODO add a function to use the calculator parallely.
-        # TODO have a problem if .xyz file that is passed in has a number of at.info stuff.
-        # Set it up so that the molpro input has no info, but when it's read out, at.info from original at file is returned.
-        # actually probably taken care of by ase itself.
-        # TODO when to make functions part of Molpro class and when just include them in this .py file?
+    def __init__(self, restart=None, ignore_bad_restart_file=False, label='molpro',
+               atoms=None, molpro_command=None, directory='MOLPRO',
+                scratch_dir=None, **kwargs):
 
         self.__name__ = 'Molpro'
         self.molpro_command = get_molpro_command(molpro_command)
 
+
         # TODO sort out how command=molpro_command works out in FileIOCalculator
         FileIOCalculator.__init__(self, restart=restart,
                 ignore_bad_restart_file=ignore_bad_restart_file, label=label,
-                atoms=atoms, command=molpro_command, **kwargs)
+                atoms=atoms, command=molpro_command, directory=directory, **kwargs)
 
 
-        # TODO How to deal with (internal) parameters like these that have pre-set values?
-        self._no_scf_iterations = None
-        self.prepare_input_only = False
-        self._rename_existing_dir = True
-        self._scf_maxit = 60
+        self.scratch_dir = scratch_dir
 
-        # TODO should be set by the fileio calculator?
-        self.set(**kwargs)
-
+        self._prepare_input_only = False
+        self._run_molpro = True
+        self._overwrite_old_outputs = True
+        # self._rename_existing_dir
+        # TODO add option to clean up all the files after a run
 
 
-    def calculate(self, atoms=None, properties=['energy'], systm_changes=all_changes):
+        # Check that necesary calculator keyword arguments are present and take required values
+        p = self.parameters
+        if 'task' not in p.keys() or 'command' not in p.keys() or\
+                    'basis' not in p.keys():
+            raise RuntimeError('Need to specify a task, command and basis at the least ')
+
+        if p.task not in self.supported_tasks:
+            raise RuntimeError(f'{p.task} not supported, "task" must be one of {self.supported_tasks}')
+
+        if p.command.upper() not in self.supported_commands:
+            raise RuntimeError(f'{p.command} not supported, "command" must be one of {self.supported_commands}')
+
+
+        if self.scratch_dir is not None:
+            # TODO deal with existing dir and create a renamed one
+            if not os.path.exists(self.scratch_dir):
+               os.makedirs(self.scratch_dir)
+
+
+
+    def calculate(self, atoms=None, properties=['energy', 'forces'], system_changes=all_changes):
 
         # TODO pass properties depending of what task is chosen
+        # TODO figure out how properties are passed around
         Calculator.calculate(self, atoms, properties, system_changes) # sets self.atoms to atoms and creates directory
-        self.write_input(self, atoms, properties, system_changes)
-        if not self.prepare_input_only:
-            self.run()
+        self.write_input(atoms, properties, system_changes)
+        if not self._prepare_input_only:
+            if self._run_molpro:
+                self.run()
             self.read() # pass properties too?
-            self.push_old_state()
+            # self.push_old_state()
 
     def write_input(self, atoms, properties=None, system_changes=None):
-        # TODO make so that either read from .xml, .out, .inp or something else.
-        # creates a directory
-        # TODO FileIOCalculator.write_input creates a directory, so does Calculator.calculate. Why duplicate? or could write input without calcultion?
+
         FileIOCalculator.write_input(self, atoms, properties, system_changes)
         p = self.parameters
         p.write(self.label + '.ase')
         ase.io.write(self.label + '.xyz', atoms)  # TODO check why not self.atoms
 
-        # Could/should make a list of accepted commands and if template is given
-        # just read the command out of there. That's assuming only one command is present though
-        if 'command' not in p.keys():
-            raise CalculatorSetupError('must give the command to run with molpro')
 
         if 'template_path' not in p.keys():
             # template with empty 'geom=' was not given, so writing from parameters
@@ -232,7 +217,7 @@ End Molpro Interface Documentation
                 f.write(f'basis={p.basis}\n')
                 if 'command_block' in p.keys():
                     if p.command not in p.command_block:
-                        raise Exception(f'set command and command in command block should mach')  # use p.command to read stuff out of output.
+                        raise RuntimeError(f'set command and command in command block should mach')  # use p.command to read stuff out of output.
                     f.write(f'{p.command_block}')
                     if p.command_block[:-2] != '\n':
                         f.write('\n')
@@ -264,8 +249,16 @@ End Molpro Interface Documentation
     def run(self):
         ''' Excecutes Molpro and prints any stdout and stderr '''
 
-        # TODO sort out scratch_dir
-        line_to_execute = f'{self.molpro_command} {self.input_fname} -o {self.output_fname}'
+        if self._overwrite_old_outputs:
+            if os.path.exists(self.output_out_fname):
+                os.remove(self.output_out_fname)
+            if os.path.exists(self.output_xml_fname):
+                os.remove(self.output_xml_fname)
+
+
+        line_to_execute = f'{self.molpro_command} {self.input_fname} -o {self.output_out_fname}'
+        if self.scratch_dir is not None:
+            line_to_execute += f' -d {self.scratch_dir}'
         stdout, stderr = shell_stdouterr(line_to_execute)
 
         if stdout:
@@ -277,22 +270,18 @@ End Molpro Interface Documentation
 
 
     def read(self):
-        """Read atoms, parameters and calculated properties from output file.
-        TODO: currently everything is stripped in preparation to do MOLPRO calculation.
-        Since MOLPRO doesn't take xyz comments. Need to deal with stripping atoms
-         in preparation and somehow read back/preserve (?) """
+        """Read atoms, parameters and calculated properties from output file."""
 
         # maybe introduce function to read open file or just generic file as with castep.
-        # deal with reading from .out not only .xml, also from a fileobject
+        # Deal with reading from .out not only .xml, also from a fileobject. Or
+        # is that not necesary?
 
         # check if .xml output is there
         if not os.path.isfile(self.label + '.xml'):
             raise ReadError('xml output file does not exist')
-        elif os.path.isfile(self.label + '.out'):
-            raise RuntimeError('.xml is not present and reading from .out files not implemented yet')
 
         # check for errors in the output file
-        self.catch_molpro_errors(self.label+'.xml')
+        catch_molpro_errors(self.label+'.xml', self.parameters.command)
 
         # read parameters
         self.parameters = Parameters.read(self.label + '.ase')
@@ -306,17 +295,13 @@ End Molpro Interface Documentation
         else:
             extract_forces = None
 
-        # TODO deal with all the info entries from atoms object passed to the calculator
-
-        atoms = self.read_xml_output(self.label+'.xml', energy_from=energy_from, extract_forces=extract_forces)
+        atoms = read_xml_output(self.label+'.xml', energy_from=energy_from, extract_forces=extract_forces)
         self.atoms = atoms
 
         # read calculated properties
         self.results['energy'] = atoms.info['energy']
         if 'gradient' in self.parameters.keys():
             self.results['forces'] = atoms.arrays['forces']
-
-
 
 
     @property
@@ -328,8 +313,12 @@ End Molpro Interface Documentation
         return self.label + '.inp'
 
     @property
-    def output_fname(self):
-        return self._label + '.out'
+    def output_out_fname(self):
+        return self.label + '.out'
+    
+    @property
+    def output_xml_fname(self):
+        return self.label + '.xml'
 
 
 class MolproDatafile(OrderedDict):
@@ -363,7 +352,7 @@ class MolproDatafile(OrderedDict):
             else:
                 self[key][0] += (';' + line)
         else:
-            nonalpha = re.compile('[^a-zA-Z0-9()\-\}\{]')  # '\-' works fine
+            nonalpha = re.compile(r'[^a-zA-Z0-9()\-\}\{]')  # '\-' works fine
             separator = re.findall(nonalpha, line)
 
             if len(separator) > 0:
@@ -459,6 +448,7 @@ class MolproDatafile(OrderedDict):
 
     def write(self, datafile=sys.stdout):
         "Write molpro input file. datafile can be a filename or an open file"
+        "At the moment is not used, since I'm constructing the template manually."
 
         if type(datafile) == type(''):
             datafile = open(datafile, 'w')
@@ -490,6 +480,7 @@ class MolproDatafile(OrderedDict):
                 datafile.write('%s%s\n' % (shortkey, value[0]))
             else:
                 datafile.write(shortkey + '\n')
+
 
 
 def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
@@ -542,6 +533,8 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
                 [all_methods[k] for k in iter(all_methods)]).replace('[',
                                                                      '').replace(
                 ']', ''))
+    else:
+        energy_from = energy_from.upper()
 
     # loop through datafile to look for methods.
     calcs = []  # holds the keys for getting correct method,
@@ -571,7 +564,7 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
 
     # create atoms object
     if atoms is None:
-        position_matrix = np.array(position_matrix).T
+        position_matrix = np.array(position_matrix)
         if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in \
                                                      datafile.keys():
             position_matrix = position_matrix * (1.0 / 0.529177249)
@@ -652,13 +645,14 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
 def catch_molpro_errors(filename, command):
 
     check_SCF_maxing_out(filename, command)
-    extract_errors_and_warnings(filename)
+    catch_errors_and_warnings(filename)
 
-def extract_errors_and_warnings(filename):
-    '''checks for any "?Error", etc in the molpro output file'''
+def catch_errors_and_warnings(filename):
+    '''checks for any "?Error", "No convergece", etc in the molpro output file'''
     pass
 
-def check_SCF_maxing_out(filename, command):
+def check_SCF_maxing_out(filename, command, maxit=60):
+    '''TODO Actually could just look for "No Convergence" in the output'''
     # and read other stuff too
     root = et.parse(filename).getroot()
     job = root.find('{http://www.molpro.net/schema/molpro-output}job')
@@ -673,39 +667,32 @@ def check_SCF_maxing_out(filename, command):
                     for idx, line in enumerate(text_lines):
                         if 'MAX. NUMBER OF ITERATIONS' in line:
                             maxit = int(re.search(r'\d+', line).group())
-                            self._scf_maxit = maxit
                         if 'Final occupancy' in line:
                             last_scf_line = text_lines[idx - 2].strip()
-                            # ^ and search are probably doubling up
                             match = re.search(r'^\d+',
                                               last_scf_line).group()
                             last_iteration = int(match)
-                            if last_iteration == self._scf_maxit:
+                            if last_iteration == maxit:
                                 raise SCFError(
                                     'Maxed out of SCF iterations')
-                            elif last_iteration > self._scf_maxit:
+                            elif last_iteration > maxit:
                                 raise RuntimeError(
                                     'last_iteration > self._scf_maxit, '
                                     'something is wrong with the code')
                         if '?APPARENTLY NO CONVERGENCE, EXIT AFTER THREE FURTHER ITERATIONS' in line:
-                            # TODO make a test for this one
                             raise SCFError('No convergence in SCF')
-
-                        # TODO Spot messages for not converging and
-                        #  stopping after a few iterations
-                    # only interested in this (TODO: unless more than one command), so can return (?).
-                    return
 
 
 
 def get_molpro_command(molpro_command=''):
-    # TODO documment this somewhere
+
     if molpro_command:
         return molpro_command
     elif 'MOLPRO_COMMAND' in os.environ:
         return os.environ['MOLPRO_COMMAND']
     else:
         return 'molpro'
+
 
 def shell_stdouterr(raw_command, cwd=None):
     """Abstracts the standard call of the commandline, when
