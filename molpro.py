@@ -26,8 +26,10 @@ from ase.calculators.calculator import all_changes
 # TODO figure out when at.info or at.arrays entries are too long for Molpro
 #      and deal with it
 # TODO add option for geometry optimisation with Molpro
-# TODO add copying over results to the atoms.
+#
 
+
+__all__ = ['Molpro']
 
 
 
@@ -54,11 +56,9 @@ Calculator arguments        Description
 
 ``scratch_dir``             Scratch directory for Molpro.
 
-``restart``                 TODO - this is given in ase.calculators.Calculator
-                            but I'm not using it anywhere
+``restart``                 TODO
 
-``ignore_bad_restart_file`` TODO - this is given in ase.calculators.Calculator
-                            but I'm not using it anywhere
+``ignore_bad_restart_file`` TODO
 
 
 =========================   ==================================================
@@ -71,11 +71,9 @@ Molpro arguments            Description
                             lating energies only or graidnets as well with
                             a Molpro call. Mandatory.
 
-``program``                 Electronic structure method to execute. Also used
+``command``                 Electronic structure method to execute. Also used
                             to extract the appropriate value from the output
-                            file. Mandatory. Referred to as 'COMMAND' in
-                            Molpro manual. TODO maybe this is confusing,
-                            reconsider?
+                            file. Mandatory.
 
 ``basis``                   Basis for the method. Mandatory.
 
@@ -83,7 +81,7 @@ Molpro arguments            Description
 
 ``memory``                  Memory in 'amount, unit' e.g. '300, w'
 
-``program_block``           Molpro command block in the form of
+``command_block``           Molpro command block in the form of
                             '{COMMAND, options \\n directives \\n data \\n}'
 
 ``maxit``                   Maximum number of SCF iterations. Molpro default
@@ -92,7 +90,7 @@ Molpro arguments            Description
 ``template_path``           A path to template to be used instead of suplying
                             keyword arguments. Must have a ``geomtyp=xyz``
                             and an unasigned ``geom=`` which is linked to the
-                            relevant file by the calculator. ``program`` must
+                            relevant file by the calculator. ``command`` must
                             also be specified to indicate which energy to pick
                             from the Molpro output file.
 
@@ -134,13 +132,13 @@ End Molpro Interface Documentation
     implemented_properties = ['energy', 'forces']
 
     default_parameters = dict(task='gradient',
-                              program='rks',
+                              command='rks',
                               basis='6-31G*',
                               functional='b3lyp')
 
     discard_results_on_any_change = True
 
-    supported_programs = ['CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2',
+    supported_commands = ['CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2',
             'DF-RMP2', 'RKS', 'UKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF']
 
     supported_tasks = ['energy_only', 'gradient']
@@ -171,84 +169,15 @@ End Molpro Interface Documentation
 
         # Check that necesary calculator keyword arguments are present and take required values
         p = self.parameters
-        if 'task' not in p.keys() or 'program' not in p.keys() or\
+        if 'task' not in p.keys() or 'command' not in p.keys() or\
                     'basis' not in p.keys():
-            raise RuntimeError('Need to specify a task, program and basis at the least ')
             raise RuntimeError('Need to specify a task, command and basis at the least ')
-
-    def calculate(self, atoms=None, properties=None, system_changes=None, copy_all_results=True):
-        # TODO what's up with system_changes, etc
-
-        # TODO do I actually need this
-        # handling the property inputs
-        if properties is None:
-            properties = self.get_default_properties()
-        else:
-            #properties = list(set(self.get_default_properties() + properties))
-            properties = list(set(['energy'] + properties))
-
-
-        for prop in properties:
-            if prop not in self.implemented_properties:
-                raise RuntimeError("Don't know how to calculate property '%s'" % prop)
-
-        Calculator.calculate(self, atoms, properties, system_changes)
-
-        calc_args = deepcopy(self.calc_args)
-        label = self._label
-
-        # do something if atoms is None
-
-        # over from molpro_driver.py
-        # -----------------------------------------------------------------------------------------
-
-        # Set up logging
-        log = logging.getLogger('molpro_driver')
-        format = logging.Formatter('%(name)s - %(levelname)-10s - %(asctime)s - %(message)s')
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(format)
-        log.addHandler(handler)
-        log.propagate = False
-        log.level = logging.INFO
-
-        log.disabled = True  # For now; somehow messages pile up in the cycle
-        log.info("Using calc args: {}".format(key_val_dict_to_str(calc_args)))
-
-        orig_dir = os.getcwd()
-
-        # ----------------------------------------------------------------
-        # Parameters
-        # ----------------------------------------------------------------
-
-        # Template used for input file
-        # need to allow option for this to be blank so long as append_lines was read
-        MOLPRO_TEMPLATE = calc_args['template']
-        del calc_args['template']
-
-        # extra lines (if any) to be appended to the template file
-        lines_to_append = []
-        if 'append_lines' in calc_args.keys():
-            log.info(calc_args['append_lines'])
-            lines_to_append = calc_args['append_lines'].split(' ')
-            del calc_args['append_lines']
-            log.info(str(lines_to_append))
-        # Command used to execute molpro, with a %s where seed name should go
-        if 'MOLPRO' in os.environ:
-            MOLPRO = os.environ['MOLPRO']
-        elif 'molpro' in calc_args.keys():
-            MOLPRO = calc_args['molpro']
-            del calc_args['molpro']
-        else:
-            MOLPRO = '~/molpro %s'
->>>>>>> master
->>>>>>> 31104f3b2754bd5a27063bd84bd1955f05f9308e
 
         if p.task not in self.supported_tasks:
             raise RuntimeError(f'{p.task} not supported, "task" must be one of {self.supported_tasks}')
 
-        if p.program.upper() not in self.supported_programs:
-            raise RuntimeError(f'{p.program} not supported, "program" must be one of {self.supported_programs}')
+        if p.command.upper() not in self.supported_commands:
+            raise RuntimeError(f'{p.command} not supported, "command" must be one of {self.supported_commands}')
 
 
         if self.scratch_dir is not None:
@@ -287,14 +216,14 @@ End Molpro Interface Documentation
                 f.write(f'geomtyp=xyz\n')
                 f.write(f'geom={self.label}.xyz\n')
                 f.write(f'basis={p.basis}\n')
-                if 'program_block' in p.keys():
-                    if p.program not in p.program_block:
-                        raise RuntimeError(f'set program and program in program block should mach')  # use p.program to read stuff out of output.
-                    f.write(f'{p.program_block}')
-                    if p.program_block[:-2] != '\n':
+                if 'command_block' in p.keys():
+                    if p.command not in p.command_block:
+                        raise RuntimeError(f'set command and command in command block should mach')  # use p.command to read stuff out of output.
+                    f.write(f'{p.command_block}')
+                    if p.command_block[:-2] != '\n':
                         f.write('\n')
                 else:
-                    f.write(f'{p.program}, {p.functional}')
+                    f.write(f'{p.command}, {p.functional}')
                     if 'maxit' in p.keys():
                         f.write(f', maxit={p.maxit}')
                     f.write(f'\n')
@@ -321,23 +250,11 @@ End Molpro Interface Documentation
     def run(self):
         ''' Excecutes Molpro and prints any stdout and stderr '''
 
-<<<<<<< HEAD
         if self._overwrite_old_outputs:
             if os.path.exists(self.output_out_fname):
                 os.remove(self.output_out_fname)
             if os.path.exists(self.output_xml_fname):
                 os.remove(self.output_xml_fname)
-=======
-        if isinstance(copy_all_results, bool) and copy_all_results:
-            #print('copying results')
-            self.atoms.info['energy'] = self.results['energy']
-            if 'forces' in self.results.keys():
-                self.atoms.info['forces'] = self.results['forces'] 
-                #at.arrays['forces'] = self.results['forces'].copy()
-
-    def get_default_properties(self):
-        return self._default_properties[:]
->>>>>>> master
 
 
         line_to_execute = f'{self.molpro_command} {self.input_fname} -o {self.output_out_fname}'
@@ -365,14 +282,14 @@ End Molpro Interface Documentation
             raise ReadError('xml output file does not exist')
 
         # check for errors in the output file
-        catch_molpro_errors(self.label+'.xml', self.parameters.program)
+        catch_molpro_errors(self.label+'.xml', self.parameters.command)
 
         # read parameters
         self.parameters = Parameters.read(self.label + '.ase')
 
 
         # read atoms from .xml file
-        energy_from = self.parameters.program
+        energy_from = self.parameters.command
         if self.parameters.task == 'gradient':
             extract_forces = True
         elif self.parameters.task == 'energy_only':
@@ -439,11 +356,7 @@ class MolproDatafile(OrderedDict):
             else:
                 self[key][0] += (';' + line)
         else:
-<<<<<<< HEAD
             nonalpha = re.compile(r'[^a-zA-Z0-9()\-\}\{]')  # '\-' works fine
-=======
-            nonalpha = re.compile('[^a-zA-Z0-9()\-\}\{]')  # '\-' works fine
->>>>>>> master
             separator = re.findall(nonalpha, line)
 
             if len(separator) > 0:
@@ -499,72 +412,6 @@ class MolproDatafile(OrderedDict):
             if line.startswith('#') or line.startswith('!') or line.startswith('*') or line == '':
                 continue
 
-<<<<<<< HEAD
-=======
-            '''
-            # Check if any brackets in line
-            open_bracket = re.search('{', line)
-            close_bracket = re.search('}', line)
-
-            if open_bracket and close_bracket:
-                # superfluous brackets, no actual multi-line command or data
-                # TODO this is bad if the brackets actually delimit a command block...
-                line = line.replace("{", "")
-                line = line.replace("}", "")
-                open_bracket = False
-                close_bracket = False
-                self.parse_line(line.strip(), current_key)
-
-            # check if command block starting
-            elif open_bracket:
-                if current_key == None:
-                    line = re.sub('{', "", line).strip()
-                    if line != "":
-                        self.parse_line(line, current_key)
-                        current_key = list(self.keys())[-1]
-                    else:
-                        raise ValueError("Parse error in datafile: standalone open bracket")
-                else:
-                    raise ValueError("Parse error in datafile: nesting of curly {} brackets is illegal")
-
-            # check if end of command block reached
-            elif close_bracket:
-                if current_key == None:
-                    raise ValueError("Parse error in datafile:  check pairing of curly {} brackets")
-                else:
-                    line = re.sub('}', "", line).strip()
-                    if line != "":
-                        self.parse_line(line, current_key)
-                        current_key = None
-                    else:
-                        current_key = None
-                        continue
-            # normal line - no brackets
-            '''
-            # else:
-            #     self.parse_line(line, current_key)
-            self.parse_line(line, current_key)
-
-    def read_from_molpro_output(self, molpro_output):
-        """Read the input file from molpro output. Input should be filename, file-like object or list of lines"""
-        if type(molpro_output) == type(''):
-            molpro_output = open(molpro_output, 'r')
-            molpro_output = molpro_output.readlines()
-        elif hasattr(molpro_output, 'read'):
-            molpro_output = molpro_output.readlines()
-
-        # Remove newlines from end of each line in molpro_output
-        molpro_output = [line.strip() for line in molpro_output]
-
-        # Find the echo of the datafile in the molpro output
-        try:
-            datafile_start = molpro_output.index('default implementation of scratch files=df')
-        except ValueError:
-            raise ValueError('Unable to find echo of datafile in molpro output')
-
-        datafile_lines = []
-        i = datafile_start + 2  # skip over the blank line produced by molpro
->>>>>>> master
 
             self.parse_line(line, current_key)
 
@@ -612,7 +459,7 @@ class MolproDatafile(OrderedDict):
 
         for key, value in self.items():
             # iteritems important here because order of lines matters
-            # if have multiple instances of a program, say, 'hf' or 'charge'
+            # if have multiple instances of a command, say, 'hf' or 'charge'
             # the n occurrences of that keyword after the first will have #n appended
             # e.g. hf, hf#2, hf#3, etc.
             if re.search('#', key):
@@ -621,7 +468,7 @@ class MolproDatafile(OrderedDict):
                 shortkey = key
             if len(value) > 1:
                 # TODO this appears to be designed for geometry specifications
-                #      but it also writes procedures when program blocks are
+                #      but it also writes procedures when command blocks are
                 #      intended - rethink this.
                 datafile.write(shortkey + '={\n')
                 for line in value:
@@ -694,19 +541,13 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
         energy_from = energy_from.upper()
 
     # loop through datafile to look for methods.
-<<<<<<< HEAD
     calcs = []  # holds the keys for getting correct method,
                 # energy_name, gradient_name
     dfile_keys_stripped = [key.replace('{', '') for key in
                            datafile.keys()]
     data_keys_upper = [key.upper() for key in dfile_keys_stripped]
 
-=======
-    calcs = []  # holds the keys for getting correct method, energy_name, gradient_name
-    dfile_keys_stripped = [key.replace('{', '') for key in datafile.keys()]
-    data_keys_upper = [key.upper() for key in dfile_keys_stripped]
-    # data_keys_upper = [key.upper() for key in datafile.keys()]
->>>>>>> master
+
     for key in all_methods.keys():
         if key in data_keys_upper:
             calcs.append(key)
@@ -723,7 +564,6 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
             posx = l.attributes['x3'].value.encode('ascii', 'ignore')
             posy = l.attributes['y3'].value.encode('ascii', 'ignore')
             posz = l.attributes['z3'].value.encode('ascii', 'ignore')
-<<<<<<< HEAD
             position_matrix.append(
                 [float(posx), float(posy), float(posz)])
 
@@ -733,23 +573,7 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
         atoms = Atoms(elements, positions=position_matrix)
 
     # extract from xml energy values for each of the methods found in datafile
-=======
-            position_matrix.append([float(posx), float(posy), float(posz)])
-    # TODO fix this
-    if cluster is None:
-        # cluster = Atoms(n=len(elements))
-        # cluster.set_atoms(elements)
-        # position_matrix = np.array(position_matrix).T
-        position_matrix = np.array(position_matrix)
-        # if not 'ANGSTROM' in datafile.keys() and not 'angstrom' in datafile.keys():
-        #     position_matrix = position_matrix * (1.0 / 0.529177249)
-        # cluster.pos[:,:]=position_matrix
-        # #note this leaves the lattice undefined
 
-        cluster = Atoms(elements, positions=position_matrix)
-
-    # now look for each of these energies in xml file
->>>>>>> master
     energy_found = False
     props = dom.documentElement.getElementsByTagName('property')
     for prop in props:
@@ -821,24 +645,16 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
 
 
 
-def catch_molpro_errors(filename, program):
+def catch_molpro_errors(filename, command):
 
-    check_SCF_maxing_out(filename, program)
+    check_SCF_maxing_out(filename, command)
     catch_errors_and_warnings(filename)
 
 def catch_errors_and_warnings(filename):
     '''checks for any "?Error", "No convergece", etc in the molpro output file'''
+    pass
 
-    dangerous_keywords = ['No convergence', 'Error', ]
-
-    with open(filename, 'r') as f:
-        for line in f:
-            for kw in dangerous_keywords:
-                if kw in line:
-                    raise RuntimeError(f'Got a dangerous word {kw} in the output')
-
-
-def check_SCF_maxing_out(filename, program, maxit=60):
+def check_SCF_maxing_out(filename, command, maxit=60):
     '''TODO Actually could just look for "No Convergence" in the output'''
     # and read other stuff too
     root = et.parse(filename).getroot()
@@ -846,7 +662,7 @@ def check_SCF_maxing_out(filename, program, maxit=60):
     jobsteps = job.findall(
         '{http://www.molpro.net/schema/molpro-output}jobstep')
     for jobstep in jobsteps:
-        if program.upper() in jobstep.attrib['command']:
+        if command.upper() in jobstep.attrib['command']:
             for child in jobstep:
                 text = child.text
                 if text is not None and 'ITERATION' in text:
