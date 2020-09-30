@@ -71,7 +71,7 @@ Molpro arguments            Description
                             lating energies only or graidnets as well with
                             a Molpro call. Mandatory.
 
-``command``                 Electronic structure method to execute. Also used
+``program``                 Electronic structure method to execute. Also used
                             to extract the appropriate value from the output
                             file. Mandatory.
 
@@ -81,7 +81,7 @@ Molpro arguments            Description
 
 ``memory``                  Memory in 'amount, unit' e.g. '300, w'
 
-``command_block``           Molpro command block in the form of
+``program_block``           Molpro command block in the form of
                             '{COMMAND, options \\n directives \\n data \\n}'
 
 ``maxit``                   Maximum number of SCF iterations. Molpro default
@@ -90,7 +90,7 @@ Molpro arguments            Description
 ``template_path``           A path to template to be used instead of suplying
                             keyword arguments. Must have a ``geomtyp=xyz``
                             and an unasigned ``geom=`` which is linked to the
-                            relevant file by the calculator. ``command`` must
+                            relevant file by the calculator. ``program`` must
                             also be specified to indicate which energy to pick
                             from the Molpro output file.
 
@@ -132,13 +132,13 @@ End Molpro Interface Documentation
     implemented_properties = ['energy', 'forces']
 
     default_parameters = dict(task='gradient',
-                              command='rks',
+                              program='rks',
                               basis='6-31G*',
                               functional='b3lyp')
 
     discard_results_on_any_change = True
 
-    supported_commands = ['CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2',
+    supported_programs = ['CCSD(T)-F12', 'CCSD(T)', 'MP2', 'DF-MP2',
             'DF-RMP2', 'RKS', 'UKS', 'RHF', 'DF-RHF', 'HF', 'DF-HF']
 
     supported_tasks = ['energy_only', 'gradient']
@@ -169,15 +169,15 @@ End Molpro Interface Documentation
 
         # Check that necesary calculator keyword arguments are present and take required values
         p = self.parameters
-        if 'task' not in p.keys() or 'command' not in p.keys() or\
+        if 'task' not in p.keys() or 'program' not in p.keys() or\
                     'basis' not in p.keys():
-            raise RuntimeError('Need to specify a task, command and basis at the least ')
+            raise RuntimeError('Need to specify a task, program and basis at the least ')
 
         if p.task not in self.supported_tasks:
             raise RuntimeError(f'{p.task} not supported, "task" must be one of {self.supported_tasks}')
 
-        if p.command.upper() not in self.supported_commands:
-            raise RuntimeError(f'{p.command} not supported, "command" must be one of {self.supported_commands}')
+        if p.program.upper() not in self.supported_programs:
+            raise RuntimeError(f'{p.program} not supported, "program" must be one of {self.supported_programs}')
 
 
         if self.scratch_dir is not None:
@@ -216,14 +216,14 @@ End Molpro Interface Documentation
                 f.write(f'geomtyp=xyz\n')
                 f.write(f'geom={self.label}.xyz\n')
                 f.write(f'basis={p.basis}\n')
-                if 'command_block' in p.keys():
-                    if p.command not in p.command_block:
-                        raise RuntimeError(f'set command and command in command block should mach')  # use p.command to read stuff out of output.
-                    f.write(f'{p.command_block}')
-                    if p.command_block[:-2] != '\n':
+                if 'program_block' in p.keys():
+                    if p.program not in p.program_block:
+                        raise RuntimeError(f'set program and program in program block should mach')  # use p.program to read stuff out of output.
+                    f.write(f'{p.program_block}')
+                    if p.program_block[:-2] != '\n':
                         f.write('\n')
                 else:
-                    f.write(f'{p.command}, {p.functional}')
+                    f.write(f'{p.program}, {p.functional}')
                     if 'maxit' in p.keys():
                         f.write(f', maxit={p.maxit}')
                     f.write(f'\n')
@@ -282,14 +282,14 @@ End Molpro Interface Documentation
             raise ReadError('xml output file does not exist')
 
         # check for errors in the output file
-        catch_molpro_errors(self.label+'.xml', self.parameters.command)
+        catch_molpro_errors(self.label+'.xml', self.parameters.program)
 
         # read parameters
         self.parameters = Parameters.read(self.label + '.ase')
 
 
         # read atoms from .xml file
-        energy_from = self.parameters.command
+        energy_from = self.parameters.program
         if self.parameters.task == 'gradient':
             extract_forces = True
         elif self.parameters.task == 'energy_only':
@@ -645,16 +645,16 @@ def read_xml_output( xmlfile, energy_from=None, extract_forces=False,
 
 
 
-def catch_molpro_errors(filename, command):
+def catch_molpro_errors(filename, program):
 
-    check_SCF_maxing_out(filename, command)
+    check_SCF_maxing_out(filename, program)
     catch_errors_and_warnings(filename)
 
 def catch_errors_and_warnings(filename):
     '''checks for any "?Error", "No convergece", etc in the molpro output file'''
     pass
 
-def check_SCF_maxing_out(filename, command, maxit=60):
+def check_SCF_maxing_out(filename, program, maxit=60):
     '''TODO Actually could just look for "No Convergence" in the output'''
     # and read other stuff too
     root = et.parse(filename).getroot()
@@ -662,7 +662,7 @@ def check_SCF_maxing_out(filename, command, maxit=60):
     jobsteps = job.findall(
         '{http://www.molpro.net/schema/molpro-output}jobstep')
     for jobstep in jobsteps:
-        if command.upper() in jobstep.attrib['command']:
+        if program.upper() in jobstep.attrib['command']:
             for child in jobstep:
                 text = child.text
                 if text is not None and 'ITERATION' in text:
