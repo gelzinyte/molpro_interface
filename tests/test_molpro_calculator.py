@@ -105,7 +105,7 @@ def test_getting_energies():
     f_start = time.time()
     at.get_forces()
     f_time = time.time() - f_start
-    # assert 'forces' in at.arrays.keys()
+
     # getting forces should be just reading them out if task=='gradient' (default)
     assert e_time/2 > f_time
 
@@ -114,7 +114,7 @@ def test_getting_energies():
 
 def test_catching_maxing_out_of_scf_iterations():
     at = molecule('CH4')
-    mp = Molpro(maxit=5)
+    mp = Molpro(maxit=3)
     # mp.run_molpro=False
     at.set_calculator(mp)
     with pytest.raises(SCFError) as execinfo:
