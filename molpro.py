@@ -169,17 +169,13 @@ End Molpro Interface Documentation
         # self._rename_existing_dir
         # TODO add option to clean up all the files after a run
 
-<<<<<<< HEAD
-
         # Check that necesary calculator keyword arguments are present and take required values
         p = self.parameters
         if 'task' not in p.keys() or 'program' not in p.keys() or\
                     'basis' not in p.keys():
-<<<<<<< HEAD
             raise RuntimeError('Need to specify a task, program and basis at the least ')
-=======
             raise RuntimeError('Need to specify a task, command and basis at the least ')
-=======
+
     def calculate(self, atoms=None, properties=None, system_changes=None, copy_all_results=True):
         # TODO what's up with system_changes, etc
 
